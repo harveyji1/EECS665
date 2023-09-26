@@ -2,3 +2,6 @@
 * project on it's own line in the following format *
 * PLEASE DO THIS EVEN IF YOU WORKED ALONE *
 lastname,firstname
+
+Ji, Harvey
+Frevert, Aiden
