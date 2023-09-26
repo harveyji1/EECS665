@@ -173,8 +173,8 @@ decl 		: varDecl SEMICOL
 		  {
 		  $$ = $1;
 		  }
- 		| classDecl { }
- 		| fnDecl { }
+ 		| classDecl { $$= $1}
+ 		| fnDecl { $$ = $1}
 
 varDecl 	: id COLON type
 		  {
@@ -184,6 +184,10 @@ varDecl 	: id COLON type
 		  }
 		| id COLON type ASSIGN exp
 		  {
+		  const Position * p;
+		  p = new Position($1->pos(), $2->pos());
+		  VarDeclNode* v = new VarDeclNode(p, $1, $3);
+		  $$ = new AssignStmtNode()
 		  }
 
 type		: primType
