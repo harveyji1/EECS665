@@ -55,7 +55,7 @@ class VarDeclNode;
 class FormalDeclNode;
 class StmtNode;
 class AssignStmtNode;
-
+class LocNode;
 
 /** 
 * class ASTNode
@@ -91,6 +91,57 @@ public:
 	StmtNode(const Position * p) : ASTNode(p){ }
 	void unparse(std::ostream& out, int indent) override = 0;
 };
+
+class ExpNode : public ASTNode{
+protected:
+	ExpNode(const Position * p) : ASTNode(p){ }
+	void unparse(std::ostream& out, int indent) override = 0;
+};
+
+class DeclNode : public StmtNode{
+public:
+	DeclNode(const Position * p) : StmtNode(p) { }
+	void unparse(std::ostream& out, int indent) override = 0;
+};
+
+class LocNode : public ExpNode{
+public:
+	LocNode(const Position * p)
+	: ExpNode(p) {}
+	void unparse(std::ostream& out, int indent) = 0;
+};
+
+/** An identifier. Note that IDNodes subclass
+ * LocNode because they are a type of memory location. 
+**/
+class IDNode : public LocNode{
+public:
+	IDNode(const Position * p, std::string nameIn) : LocNode(p), name(nameIn){ }
+	void unparse(std::ostream& out, int indent);
+private:
+	/** The name of the identifier **/
+	std::string name;
+};
+
+/** A variable declaration
+**/
+class VarDeclNode : public DeclNode{
+public:
+	VarDeclNode(const Position * p, IDNode * inID, TypeNode * inType) 
+	: DeclNode(p), myID(inID), myType(inType){
+		assert (myType != nullptr);
+		assert (myID != nullptr);
+	}
+	void unparse(std::ostream& out, int indent);
+private:
+	IDNode * myID;
+	TypeNode * myType;
+};
+
+/** A memory location. LocNodes subclass ExpNode
+ * because they can be used as part of an expression. 
+**/
+
 
 class BinaryExpNode : public ExpNode{
 public:
@@ -243,6 +294,28 @@ private:
 	CallExpNode* m_func;
 };
 
+class FnDeclNode : public DeclNode{
+public:
+	FnDeclNode(const Position * p, TypeNode * type, IDNode * id, std::list<FormalDeclNode * > * paramIn, std::list<StmtNode * > * funcBody)
+	: DeclNode(p), myType(type), myId(id), parameters(paramIn), functionBody(funcBody) { }
+	void unparse(std::ostream& out, int indent) override;
+private:
+	TypeNode * myType;
+	IDNode * myId;
+	std::list<FormalDeclNode * > *parameters;
+	std::list<StmtNode * > *functionBody;
+};
+
+class FormalDeclNode : public VarDeclNode{
+public:
+	FormalDeclNode(const Position * p, TypeNode * type, IDNode * id)
+	: VarDeclNode(p, type, id),  myType(type), myId(id) { }
+	void unparse(std::ostream& out, int indent) override;
+private:
+	TypeNode * myType;
+	IDNode * myId;
+};
+
 //Double Check this
 class ExitStmtNode : public StmtNode{
 public:
@@ -327,21 +400,13 @@ public:
 * Superclass for declarations (i.e. nodes that can be used to 
 * declare a struct, function, variable, etc).  This base class will 
 **/
-class DeclNode : public StmtNode{
-public:
-	DeclNode(const Position * p) : StmtNode(p) { }
-	void unparse(std::ostream& out, int indent) override = 0;
-};
 
-/**  \class ExpNode
+
+/**  class ExpNode
 * Superclass for expression nodes (i.e. nodes that can be used as
 * part of an expression).  Nodes that are part of an expression
 * should inherit from this abstract superclass.
 **/
-class ExpNode : public ASTNode{
-protected:
-	ExpNode(const Position * p) : ASTNode(p){ }
-};
 
 class TrueNode : public ExpNode{
 public:
@@ -366,7 +431,7 @@ private:
 class CallExpNode : public ExpNode{
 public:
 	CallExpNode(Position* p, LocNode* name) : ExpNode(p), m_nameFunc(name){ }
-	CallExpNode(Position* p, IDNode* name, std::list<ExpNode*>* arg) : ExpNode(p), m_nameFunc(name), m_arg(arg) {}
+	CallExpNode(Position* p, LocNode* name, std::list<ExpNode*>* arg) : ExpNode(p), m_nameFunc(name), m_arg(arg) {}
 	void unparse(std::ostream& out, int indent) override;
 private:
 	LocNode* m_nameFunc;
@@ -428,7 +493,7 @@ public:
 
 class IntTypeNode : public TypeNode{
 public:
-	IntTypeNode(Position* p) : TypeNode(p){ }
+	IntTypeNode(const Position* p) : TypeNode(p){ }
 	void unparse(std::ostream& out, int indent) override;
 };
 
@@ -444,28 +509,6 @@ public:
 	void unparse(std::ostream& out, int indent) override;
 };
 
-/** A memory location. LocNodes subclass ExpNode
- * because they can be used as part of an expression. 
-**/
-class LocNode : public ExpNode{
-public:
-	LocNode(const Position * p)
-	: ExpNode(p) {}
-	void unparse(std::ostream& out, int indent) = 0;
-};
-
-/** An identifier. Note that IDNodes subclass
- * LocNode because they are a type of memory location. 
-**/
-class IDNode : public LocNode{
-public:
-	IDNode(const Position * p, std::string nameIn) : LocNode(p), name(nameIn){ }
-	void unparse(std::ostream& out, int indent);
-private:
-	/** The name of the identifier **/
-	std::string name;
-};
-
 //Double check this
 class MemberFieldExpNode : public LocNode{
 public:
@@ -474,28 +517,6 @@ public:
 private:
 	LocNode* m_baseClass;
 	IDNode* m_fieldName;
-};
-
- 
-/** A variable declaration
-**/
-class VarDeclNode : public DeclNode{
-public:
-	VarDeclNode(const Position * p, IDNode * inID, TypeNode * inType) 
-	: DeclNode(p), myID(inID), myType(inType){
-		assert (myType != nullptr);
-		assert (myID != nullptr);
-	}
-	void unparse(std::ostream& out, int indent);
-private:
-	IDNode * myID;
-	TypeNode * myType;
-};
-
-class IntTypeNode : public TypeNode{
-public:
-	IntTypeNode(const Position * p) : TypeNode(p){ }
-	void unparse(std::ostream& out, int indent);
 };
 
 } //End namespace drewno_mars

@@ -218,11 +218,6 @@ void StrLitNode::unparse(std::ostream& out, int indent){
 	out << this->stringVal;
 }
 
-void MayhemNode::unparse(std::ostream& out, int indent){
-	doIndent(out, indent);
-	out << "mayhem";
-}
-
 void NotNode::unparse(std::ostream& out, int indent){
 	doIndent(out, indent);
 	out << "(";
