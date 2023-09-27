@@ -104,6 +104,12 @@ public:
 	void unparse(std::ostream& out, int indent) override = 0;
 };
 
+class ClassDefnNode : public DeclNode {
+	public:
+	ClassDefnNode(const Position * p): DeclNode(p) { }
+	void unparse(std::ostream& out, int indent) = 0;
+};
+
 class LocNode : public ExpNode{
 public:
 	LocNode(const Position * p)
@@ -294,6 +300,16 @@ private:
 	CallExpNode* m_func;
 };
 
+class FormalDeclNode : public VarDeclNode{
+public:
+	FormalDeclNode(const Position * p, TypeNode * type, IDNode * id)
+	: VarDeclNode(p, id, type),  myType(type), myId(id) { }
+	void unparse(std::ostream& out, int indent) override;
+private:
+	TypeNode * myType;
+	IDNode * myId;
+};
+
 class FnDeclNode : public DeclNode{
 public:
 	FnDeclNode(const Position * p, TypeNode * type, IDNode * id, std::list<FormalDeclNode * > * paramIn, std::list<StmtNode * > * funcBody)
@@ -306,15 +322,6 @@ private:
 	std::list<StmtNode * > *functionBody;
 };
 
-class FormalDeclNode : public VarDeclNode{
-public:
-	FormalDeclNode(const Position * p, TypeNode * type, IDNode * id)
-	: VarDeclNode(p, type, id),  myType(type), myId(id) { }
-	void unparse(std::ostream& out, int indent) override;
-private:
-	TypeNode * myType;
-	IDNode * myId;
-};
 
 //Double Check this
 class ExitStmtNode : public StmtNode{
