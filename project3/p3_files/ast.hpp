@@ -93,7 +93,7 @@ public:
 };
 
 class ExpNode : public ASTNode{
-protected:
+public:
 	ExpNode(const Position * p) : ASTNode(p){ }
 	void unparse(std::ostream& out, int indent) override = 0;
 };
@@ -138,6 +138,7 @@ public:
 		assert (myType != nullptr);
 		assert (myID != nullptr);
 	}
+	//add second constructor
 	void unparse(std::ostream& out, int indent);
 private:
 	IDNode * myID;
@@ -166,7 +167,6 @@ public:
 	AndNode(const Position * p, ExpNode * lhs, ExpNode * rhs)
 	: BinaryExpNode(p, lhs, rhs), myLhs(lhs), myRhs(rhs) {}
 	void unparse(std::ostream& out, int indent) override;
-	private:
 	ExpNode * myLhs;
 	ExpNode * myRhs;
 };
@@ -284,9 +284,8 @@ public:
 class AssignStmtNode : public StmtNode{
 public:
 	AssignStmtNode(Position* p , LocNode* dest) : StmtNode(p), m_dest(dest) { }
-	AssignStmtNode(Position* p , LocNode* sourceExpr) : StmtNode(p), m_sourceExpr(sourceExpr) { }
+	AssignStmtNode(Position* p , ExpNode* sourceExpr) : StmtNode(p), m_sourceExpr(sourceExpr) { }
 	void unparse(std::ostream& out, int indent) override;
-private:
 	LocNode* m_dest;
 	ExpNode* m_sourceExpr;
 };
@@ -296,7 +295,6 @@ public:
 	CallStmtNode(Position* p, CallExpNode* func)
 	: StmtNode(p), m_func(func){ }
 	void unparse(std::ostream& out, int indent) override;
-private:
 	CallExpNode* m_func;
 };
 
@@ -456,7 +454,7 @@ private:
 class UnaryExpNode : public ExpNode{
 public:
 	UnaryExpNode(Position* p, ExpNode* expr) : ExpNode(p), m_expr(expr){ }
-	void unparse(std::ostream& out, int indent) override;
+	void unparse(std::ostream& out, int indent) override = 0;
 private:
 	ExpNode* m_expr;
 };

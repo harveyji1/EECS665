@@ -173,21 +173,20 @@ decl 		: varDecl SEMICOL
 		  {
 		  $$ = $1;
 		  }
- 		| classDecl { $$= $1}
- 		| fnDecl { $$ = $1}
+ 		| classDecl { }
+ 		| fnDecl { }
 
 varDecl 	: id COLON type
 		  {
 		  const Position * p;
-		  p = new Position($1->pos(), $2->pos());
+		  p = new Position($1->pos(), $3->pos());
 		  $$ = new VarDeclNode(p, $1, $3);
 		  }
 		| id COLON type ASSIGN exp
 		  {
-		  const Position * p;
-		  p = new Position($1->pos(), $2->pos());
-		  VarDeclNode* v = new VarDeclNode(p, $1, $3);
-		  $$ = new AssignStmtNode()
+			const Position * p;
+			p = new Position($1->pos(), $5->pos());
+			$$ = new VarDeclNode(p, $1, $3, $5);
 		  }
 
 type		: primType
@@ -196,6 +195,7 @@ type		: primType
 		  }
 		| id
 		  {
+		  $$ = $1;
 		  }
 		| PERFECT primType
 		  {
@@ -304,9 +304,15 @@ stmt		: varDecl
 
 exp		: exp DASH exp
 	  	  {
+			const Position * p;
+			p = new Position($1->pos(), $3->pos());
+			$$ = new MinusNode(p, $1, $3);
 		  }
 		| exp CROSS exp
 	  	  {
+			const Position * p;
+			p = new Position($1->pos(), $3->pos());
+			$$ = new PlusNode(p, $1, $3);
 		  }
 		| exp STAR exp
 	  	  {
@@ -340,12 +346,19 @@ exp		: exp DASH exp
 		  }
 		| NOT exp
 	  	  {
+			const Position * p;
+			p = new Position($1->pos(), $2->pos());
+			$$ = new NotNode(p, $2);
 		  }
 		| DASH term
 	  	  {
+			const Position * p;
+			p = new Position($1->pos(), $2->pos());
+			$$ = new NotNode(p, $2);
 		  }
 		| term
 	  	  {
+			$$ = $1;
 		  }
 
 callExp		: loc LPAREN RPAREN
