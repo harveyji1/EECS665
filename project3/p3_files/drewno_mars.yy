@@ -63,10 +63,21 @@ project)
    drewno_mars::ProgramNode*                   transProgram;
    drewno_mars::DeclNode *                     transDecl;
    std::list<drewno_mars::DeclNode *> *        transDeclList;
+   std::list<drewno_mars::ExpNode *> *         transExpList;
+   std::list<drewno_mars::StmtNode *> *        transStmtList;
+   std::list<drewno_mars::FormalDeclNode *> *  transFormalDeclList;
    drewno_mars::VarDeclNode *                  transVarDecl;
    drewno_mars::TypeNode *                     transType;
    drewno_mars::LocNode *                      transLoc;
    drewno_mars::IDNode *                       transID;
+   drewno_mars::IntLitToken*				   transIntToken;
+   drewno_mars::StrToken*					   transStrToken;
+   drewno_mars::StmtNode*					   transStmt;	
+   drewno_mars::CallExpNode*				   transCallStmt;	
+   drewno_mars::ExpNode*					   transExp;
+   drewno_mars::ClassDefnNode*				   transClassDefn;
+   drewno_mars::FnDeclNode*				       transFnDecl;
+   drewno_mars::FormalDeclNode *               transFormalDecl;
 }
 
 %define parse.assert
@@ -135,12 +146,25 @@ project)
 /*    (attribute type)    (nonterminal)    */
 %type <transProgram> program
 %type <transDeclList> globals
+%type <transDeclList> classBody
+%type <transExpList> actualsList
+%type <transStmtList> stmtList
 %type <transDecl> decl
 %type <transVarDecl> varDecl
 %type <transType> type
 %type <transType> primType
+%type <transType> term
 %type <transLoc> loc
 %type <transID> id
+%type <transStmt> stmt
+%type <transCallStmt> callExp
+%type <transStmt> blockStmt
+%type <transExp> exp
+%type <transClassDefn> classDecl
+%type <transFnDecl> fnDecl
+%type <transFormalDecl> formalDecl
+%type <transFormalDeclList> formalsList
+%type <transFormalDeclList> formals
 
 %right ASSIGN
 %left OR
@@ -173,8 +197,8 @@ decl 		: varDecl SEMICOL
 		  {
 		  $$ = $1;
 		  }
- 		| classDecl { }
- 		| fnDecl { }
+ 		| classDecl { $$ = $1; }
+ 		| fnDecl { $$ = $1; }
 
 varDecl 	: id COLON type
 		  {
@@ -199,9 +223,15 @@ type		: primType
 		  }
 		| PERFECT primType
 		  {
+			const Position * p;
+			p = new Position($1->pos(), $2->pos());
+			$$ = new PerfectTypeNode(p);
 		  }
 		| PERFECT id
 		  {
+			const Position * p;
+			p = new Position($1->pos(), $2->pos());
+			$$ = new PerfectTypeNode(p);
 		  }
 
 primType 	: INT
@@ -210,17 +240,25 @@ primType 	: INT
 		  }
 		| BOOL
 		  {
+			$$ = new BoolTypeNode($1->pos());
 		  }
 		| VOID
 		  {
+			$$ = new VoidTypeNode($1->pos());
 		  }
 
 classDecl	: id COLON CLASS LCURLY classBody RCURLY SEMICOL
 		  {
+			const Position * p;
+			p = new Position($1->pos(), $7->pos());
+			$$ = new ClassDefnNode(p, $1, $5);
 		  }
 
 classBody	: classBody varDecl SEMICOL
 		  {
+			const Position * p;
+			p = new Position($1->pos(), $3->pos());
+			$$ = new ClassDefnNode(p);
 		  }
 		| classBody fnDecl
 		  {
@@ -231,75 +269,131 @@ classBody	: classBody varDecl SEMICOL
 
 fnDecl  : id COLON LPAREN formals RPAREN type LCURLY stmtList RCURLY
 		  {
+			const Position * p;
+			p = new Position($1->pos(), $9->pos());
+			$$ = new FnDeclNode(p, $1, $4, $6, $7)
 		  }
 
 formals 	: /* epsilon */
 		  {
+			$$ = new std::list<FormalDeclNode *>();
 		  }
 		| formalsList
 		  {
+			$$ = $1;
 		  }
 
 formalsList 	: formalDecl
 		  {
+		  std::list<drewno_mars::FormalDeclNode *> formalDeclsList = new std::list<drewno_mars::FormalDeclNode *>
+		  FormalDeclNode * fdeclNode = $1;
+		  $$->push_back(fdeclNode);
 		  }
 		| formalsList COMMA formalDecl
 		  {
+		  $$ = $1;
+		  FormalDeclNode * fdeclNode = $3;
+		  $$->push_back(fdeclNode);
 		  }
 
 formalDecl 	: id COLON type
 		  {
+			const Position * p;
+			p = new Position($1->pos(), $3->pos());
+			$$ = new FormalDeclNode(p, $1, $3);
 		  }
 
 stmtList 	: /* epsilon */
 	   	  {
+			$$ = new std::list<StmtNode *>();
 	   	  }
 		| stmtList stmt SEMICOL
 	  	  {
+			$$ = $1;
+		  	StmtNode * stmtNode = $2;
+		  	$$->push_back(stmtNode);
 	  	  }
 		| stmtList blockStmt
 	  	  {
+			$$ = $1;
+		  	StmtNode * stmtNode = $2;
+		  	$$->push_back(stmtNode);
 	  	  }
 
 blockStmt	: WHILE LPAREN exp RPAREN LCURLY stmtList RCURLY
 		  {
+			const Position * p;
+			p = new Position($1->pos(), $7->pos());
+			$$ = new WhileStmtNode(p, $3, $6);
 		  }
 		| IF LPAREN exp RPAREN LCURLY stmtList RCURLY
 		  {
+			const Position * p;
+			p = new Position($1->pos(), $6->pos());
+			$$ = new IfStmtNode(p, $3, $5);
 		  }
 		| IF LPAREN exp RPAREN LCURLY stmtList RCURLY ELSE LCURLY stmtList RCURLY
 		  {
+			const Position * p;
+			p = new Position($1->pos(), $11->pos());
+			$$ = new IfStmtNode(p, $3, $6, $10);
 		  }
 
 stmt		: varDecl
 		  {
+			$$ = $1
 		  }
 		| loc ASSIGN exp
 		  {
+			const Position * p;
+			p = new Position($1->pos(), $3->pos());
+			$$ = new StmtNode(p, $1, $3);
 		  }
 		| loc POSTDEC
 		  {
+			const Position * p;
+			p = new Position($1->pos(), $2->pos());
+			$$ = new PostDecNode(p, $1);
 		  }
 		| loc POSTINC
 		  {
+			const Position * p;
+			p = new Position($1->pos(), $2->pos());
+			$$ = new PostIncNode(p, $1);
 		  }
 		| GIVE exp
 		  {
+			const Position * p;
+			p = new Position($1->pos(), $2->pos());
+			$$ = new GiveStmtNode(p, $2);
 		  }
 		| TAKE loc
 		  {
+			const Position * p;
+			p = new Position($1->pos(), $2->pos());
+			$$ = new TakeStmtNode(p, $2);
 		  }
 		| RETURN exp
 		  {
+			const Position * p;
+			p = new Position($1->pos(), $2->pos());
+			$$ = new ReturnStmtNode(p, $2);
 		  }
 		| RETURN
 		  {
+			const Position * p;
+			p = new Position($1->pos());
+			$$ = new ReturnStmtNode(p);
 		  }
 		| EXIT
 		  {
+			const Position * p;
+			p = new Position($1->pos());
+			$$ = new ExitStmtNode(p);
 		  }
 		| callExp
 		  { 
+			$$ = $1
 		  }
 
 exp		: exp DASH exp
@@ -316,33 +410,63 @@ exp		: exp DASH exp
 		  }
 		| exp STAR exp
 	  	  {
+			const Position * p;
+			p = new Position($1->pos(), $3->pos());
+			$$ = new TimesNode(p, $1, $3);
 		  }
 		| exp SLASH exp
 	  	  {
+			const Position * p;
+			p = new Position($1->pos(), $3->pos());
+			$$ = new DivNode(p, $1, $3);
 		  }
 		| exp AND exp
 	  	  {
+			const Position * p;
+			p = new Position($1->pos(), $3->pos());
+			$$ = new AndNode(p, $1, $3);
 		  }
 		| exp OR exp
 	  	  {
+			const Position * p;
+			p = new Position($1->pos(), $3->pos());
+			$$ = new OrNode(p, $1, $3);
 		  }
 		| exp EQUALS exp
 	  	  {
+			const Position * p;
+			p = new Position($1->pos(), $3->pos());
+			$$ = new EqualsNode(p, $1, $3);
 		  }
 		| exp NOTEQUALS exp
 	  	  {
+			const Position * p;
+			p = new Position($1->pos(), $3->pos());
+			$$ = new NotEqalsNode(p, $1, $3);
 		  }
 		| exp GREATER exp
 	  	  {
+			const Position * p;
+			p = new Position($1->pos(), $3->pos());
+			$$ = new GreaterNode(p, $1, $3);
 		  }
 		| exp GREATEREQ exp
 	  	  {
+			const Position * p;
+			p = new Position($1->pos(), $3->pos());
+			$$ = new GreaterEqNode(p, $1, $3);
 		  }
 		| exp LESS exp
 	  	  {
+			const Position * p;
+			p = new Position($1->pos(), $3->pos());
+			$$ = new LessNode(p, $1, $3);
 		  }
 		| exp LESSEQ exp
 	  	  {
+			const Position * p;
+			p = new Position($1->pos(), $3->pos());
+			$$ = new LessEqNode(p, $1, $3);
 		  }
 		| NOT exp
 	  	  {
@@ -354,7 +478,7 @@ exp		: exp DASH exp
 	  	  {
 			const Position * p;
 			p = new Position($1->pos(), $2->pos());
-			$$ = new NotNode(p, $2);
+			$$ = new NegNode(p, $2);
 		  }
 		| term
 	  	  {
@@ -363,41 +487,71 @@ exp		: exp DASH exp
 
 callExp		: loc LPAREN RPAREN
 		  {
+			const Position * p;
+			p = new Position($1->pos(), $3->pos());
+			$$ = new CallExpNode(p, $1);
 		  }
 		| loc LPAREN actualsList RPAREN
 		  {
+			const Position * p;
+			p = new Position($1->pos(), $4->pos());
+			$$ = new CallExpNode(p, $1, $2);
 		  }
 
 actualsList	: exp
 		  {
+			$$ = $1
 		  }
 		| actualsList COMMA exp
 		  {
+			const Position * p;
+			p = new Position($1->pos(), $3->pos());
+			$$ = new IfStmtNode(p, $1, $3);
 		  }
 
 term 		: loc
 		  { 
+			$$ = $1;
 		  }
 		| INTLITERAL 
 		  {
+			const Position * p;
+			p = new Position($1->pos());
+			$$ = new IntLitNode(p);
 		  }
 		| STRINGLITERAL 
 		  {
+			const Position * p;
+			p = new Position($1->pos());
+			$$ = new StrLitNode(p);
 		  }
 		| TRUE
 		  {
+			const Position * p;
+			p = new Position($1->pos());
+			$$ = new TrueNode(p);
 		  }
 		| FALSE
 		  {
+			const Position * p;
+			p = new Position($1->pos());
+			$$ = new FalseNode(p);
 		  }
 		| MAGIC
 		  {
+			const Position * p;
+			p = new Position($1->pos());
+			$$ = new MagicNode(p);
 		  }
 		| LPAREN exp RPAREN
 		  {
+			const Position * p;
+			p = new Position($1->pos(), $3->pos());
+			$$ = new ExpNode(p, $2);
 		  }
 		| callExp
 		  {
+			$$ = $1
 		  }
 
 loc		: id
@@ -406,6 +560,9 @@ loc		: id
 		  }
 		| loc POSTDEC id
 		  {
+			const Position * p;
+			p = new Position($1->pos(), $3->pos());
+			$$ = new MemberFieldExpNode(p, $3);
 		  }
 
 id		: ID

@@ -19,7 +19,6 @@ class TypeNode;
 class StmtNode;
 class IDNode;
 class ExpNode;
-class TypeNode;
 class IDNode;
 class CallExpNode;
 class ExpNode;
@@ -139,10 +138,17 @@ public:
 		assert (myID != nullptr);
 	}
 	//add second constructor
+	VarDeclNode(const Position * p, IDNode * inID, TypeNode * inType, ExpNode * inExp) 
+	: DeclNode(p), myID(inID), myType(inType), myExp(inExp){
+		assert (myType != nullptr);
+		assert (myID != nullptr);
+		assert (myExp != nullptr);
+	}
 	void unparse(std::ostream& out, int indent);
 private:
 	IDNode * myID;
 	TypeNode * myType;
+	ExpNode * myExp;
 };
 
 /** A memory location. LocNodes subclass ExpNode
@@ -283,8 +289,8 @@ public:
 
 class AssignStmtNode : public StmtNode{
 public:
-	AssignStmtNode(Position* p , LocNode* dest) : StmtNode(p), m_dest(dest) { }
-	AssignStmtNode(Position* p , ExpNode* sourceExpr) : StmtNode(p), m_sourceExpr(sourceExpr) { }
+	AssignStmtNode(const Position * p , LocNode* dest) : StmtNode(p), m_dest(dest) { }
+	AssignStmtNode(const Position * p , ExpNode* sourceExpr) : StmtNode(p), m_sourceExpr(sourceExpr) { }
 	void unparse(std::ostream& out, int indent) override;
 	LocNode* m_dest;
 	ExpNode* m_sourceExpr;
@@ -292,7 +298,7 @@ public:
 
 class CallStmtNode : public StmtNode{
 public:
-	CallStmtNode(Position* p, CallExpNode* func)
+	CallStmtNode(const Position * p, CallExpNode* func)
 	: StmtNode(p), m_func(func){ }
 	void unparse(std::ostream& out, int indent) override;
 	CallExpNode* m_func;
@@ -324,20 +330,20 @@ private:
 //Double Check this
 class ExitStmtNode : public StmtNode{
 public:
-	ExitStmtNode(const Position* p) : StmtNode(p){ }
+	ExitStmtNode(const Position * p) : StmtNode(p){ }
 	void unparse(std::ostream& out, int indent) override = 0;
 };
 
 //Double Check this
 class GiveStmtNode : public StmtNode{
 public:
-	GiveStmtNode(const Position* p) : StmtNode(p){ }
+	GiveStmtNode(const Position * p) : StmtNode(p){ }
 	void unparse(std::ostream& out, int indent) override = 0;
 };
 
 class IfElseStmtNode : public StmtNode{
 public:
-	IfElseStmtNode(Position* p , ExpNode * condition, std::list<StmtNode*>* tbody, std::list<StmtNode*>* fbody ) 
+	IfElseStmtNode(const Position * p , ExpNode * condition, std::list<StmtNode*>* tbody, std::list<StmtNode*>* fbody ) 
 	: StmtNode(p), m_condition(condition), m_tbody(tbody) ,m_fbody(fbody) { }
 	void unparse(std::ostream& out, int indent) override;
 	private:
@@ -348,7 +354,7 @@ public:
 
 class IfStmtNode : public StmtNode{
 public:
-	IfStmtNode(Position* p , ExpNode* condition , std::list<StmtNode*>* body) 
+	IfStmtNode(const Position * p , ExpNode* condition , std::list<StmtNode*>* body) 
 	: StmtNode(p), m_condition(condition), m_ifBody(body) { }
 	void unparse(std::ostream& out, int indent) override;
 	private:
@@ -358,7 +364,7 @@ public:
 
 class PostDecStmtNode : public StmtNode{
 public:
-	PostDecStmtNode(Position* p , LocNode* var) : StmtNode(p), m_var(var) { }
+	PostDecStmtNode(const Position * p , LocNode* var) : StmtNode(p), m_var(var) { }
 	void unparse(std::ostream& out, int indent) override;
 	private:
 	LocNode* m_var;
@@ -366,7 +372,7 @@ public:
 
 class PostIncStmtNode : public StmtNode{
 public:
-	PostIncStmtNode(Position * p , LocNode* var) : StmtNode(p), m_var(var) { }
+	PostIncStmtNode(const Position * p , LocNode* var) : StmtNode(p), m_var(var) { }
 	void unparse(std::ostream& out, int indent) override;
 	private:
 		LocNode* m_var;
@@ -374,8 +380,8 @@ public:
 
 class ReturnStmtNode : public StmtNode{
 public:
-	ReturnStmtNode(Position* p , ExpNode* expr) : StmtNode(p), m_expr(expr) { }
-	ReturnStmtNode(Position* p) : StmtNode(p) {}
+	ReturnStmtNode(const Position * p , ExpNode* expr) : StmtNode(p), m_expr(expr) { }
+	ReturnStmtNode(const Position * p) : StmtNode(p) {}
 	void unparse(std::ostream& out, int indent) override;
 	private:
 	ExpNode* m_expr;
@@ -383,7 +389,7 @@ public:
 
 class TakeStmtNode : public StmtNode{
 public:
-	TakeStmtNode(Position * p , LocNode* var) : StmtNode(p), m_var(var) { }
+	TakeStmtNode(const Position * p , LocNode* var) : StmtNode(p), m_var(var) { }
 	void unparse(std::ostream& out, int indent) override;
 	private:
 		LocNode* m_var;
@@ -391,7 +397,7 @@ public:
 
 class WhileStmtNode : public StmtNode{
 public:
-	WhileStmtNode(Position* p , ExpNode* condition, std::list<StmtNode*>* body ) 
+	WhileStmtNode(const Position * p , ExpNode* condition, std::list<StmtNode*>* body ) 
 	: StmtNode(p), m_condition(condition), m_whileBody(body) { }
 	void unparse(std::ostream& out, int indent) override;
 	private:
@@ -415,19 +421,19 @@ public:
 
 class TrueNode : public ExpNode{
 public:
-	TrueNode(Position* p) : ExpNode(p){ }
+	TrueNode(const Position * p) : ExpNode(p){ }
 	void unparse(std::ostream& out, int indent) override;
 };
 
 class FalseNode : public ExpNode{
 public:
-	FalseNode(Position* p) : ExpNode(p){ }
+	FalseNode(const Position * p) : ExpNode(p){ }
 	void unparse(std::ostream& out, int indent) override;
 };
 
 class StrLitNode : public ExpNode{
 public:
-	StrLitNode(Position* p, std::string val) : ExpNode(p), stringVal(val) {}
+	StrLitNode(const Position * p, std::string val) : ExpNode(p), stringVal(val) {}
 	void unparse(std::ostream& out, int indent) override;
 private:
 	std::string stringVal;
@@ -435,8 +441,8 @@ private:
 
 class CallExpNode : public ExpNode{
 public:
-	CallExpNode(Position* p, LocNode* name) : ExpNode(p), m_nameFunc(name){ }
-	CallExpNode(Position* p, LocNode* name, std::list<ExpNode*>* arg) : ExpNode(p), m_nameFunc(name), m_arg(arg) {}
+	CallExpNode(const Position * p, LocNode* name) : ExpNode(p), m_nameFunc(name){ }
+	CallExpNode(const Position * p, LocNode* name, std::list<ExpNode*>* arg) : ExpNode(p), m_nameFunc(name), m_arg(arg) {}
 	void unparse(std::ostream& out, int indent) override;
 private:
 	LocNode* m_nameFunc;
@@ -445,15 +451,23 @@ private:
 
 class IntLitNode : public ExpNode{
 public:
-	IntLitNode(Position* p, int val) : ExpNode(p), m_numval(val){ }
+	IntLitNode(const Position * p, int val) : ExpNode(p), m_numval(val){ }
 	void unparse(std::ostream& out, int indent) override;
 private:
 	int m_numval;
 };
 
+class MagicNode : public ExpNode{
+public:
+	MagicNode(const Position * p, int val) : ExpNode(p), m_magic(val){ }
+	void unparse(std::ostream& out, int indent) override;
+private:
+	int m_magic;
+};
+
 class UnaryExpNode : public ExpNode{
 public:
-	UnaryExpNode(Position* p, ExpNode* expr) : ExpNode(p), m_expr(expr){ }
+	UnaryExpNode(const Position * p, ExpNode* expr) : ExpNode(p), m_expr(expr){ }
 	void unparse(std::ostream& out, int indent) override = 0;
 private:
 	ExpNode* m_expr;
@@ -461,13 +475,13 @@ private:
 
 class NegNode : public UnaryExpNode{
 public:
-	NegNode(Position* p, ExpNode* expr) : UnaryExpNode(p, expr) { }
+	NegNode(const Position * p, ExpNode* expr) : UnaryExpNode(p, expr) { }
 	void unparse(std::ostream& out, int indent) override;
 };
 
 class NotNode  : public UnaryExpNode{
 public:
-	NotNode(Position* p, ExpNode* expr) : UnaryExpNode(p, expr) { }
+	NotNode(const Position * p, ExpNode* expr) : UnaryExpNode(p, expr) { }
 	void unparse(std::ostream& out, int indent) override;
 };
 
@@ -486,39 +500,39 @@ public:
 
 class BoolTypeNode : public TypeNode{
 public:
-	BoolTypeNode(Position* p) : TypeNode(p){ }
-	void unparse(std::ostream& out, int indent) override;
-};
-
-class ClassTypeNode : public TypeNode{
-public:
-	ClassTypeNode(Position* p) : TypeNode(p){ }
-	void unparse(std::ostream& out, int indent) override;
-};
-
-class IntTypeNode : public TypeNode{
-public:
-	IntTypeNode(const Position* p) : TypeNode(p){ }
-	void unparse(std::ostream& out, int indent) override;
-};
-
-class PerfectTypeNode : public TypeNode{
-public:
-	PerfectTypeNode(Position* p) : TypeNode(p){ }
+	BoolTypeNode(const Position * p) : TypeNode(p){ }
 	void unparse(std::ostream& out, int indent) override;
 };
 
 class VoidTypeNode : public TypeNode{
 public:
-	VoidTypeNode(Position* p) : TypeNode(p){ }
+	VoidTypeNode(const Position * p) : TypeNode(p){ }
+	void unparse(std::ostream& out, int indent) override;
+};
+
+class ClassTypeNode : public TypeNode{
+public:
+	ClassTypeNode(const Position * p) : TypeNode(p){ }
+	void unparse(std::ostream& out, int indent) override;
+};
+
+class IntTypeNode : public TypeNode{
+public:
+	IntTypeNode(const Position * p) : TypeNode(p){ }
+	void unparse(std::ostream& out, int indent) override;
+};
+
+class PerfectTypeNode : public TypeNode{
+public:
+	PerfectTypeNode(const Position * p) : TypeNode(p){ }
 	void unparse(std::ostream& out, int indent) override;
 };
 
 //Double check this
 class MemberFieldExpNode : public LocNode{
 public:
-	MemberFieldExpNode(const Position* p, LocNode* baseClass) : LocNode(p), m_baseClass(baseClass){}
-	MemberFieldExpNode(const Position* p, IDNode* fieldName) : LocNode(p), m_fieldName(fieldName){}
+	MemberFieldExpNode(const Position * p, LocNode* baseClass) : LocNode(p), m_baseClass(baseClass){}
+	MemberFieldExpNode(const Position * p, IDNode* fieldName) : LocNode(p), m_fieldName(fieldName){}
 private:
 	LocNode* m_baseClass;
 	IDNode* m_fieldName;
