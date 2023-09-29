@@ -105,8 +105,11 @@ public:
 
 class ClassDefnNode : public DeclNode {
 	public:
-	ClassDefnNode(const Position * p): DeclNode(p) { }
-	void unparse(std::ostream& out, int indent) = 0;
+	ClassDefnNode(const Position * p, IDNode* classId, std::list<DeclNode * > * members): DeclNode(p), m_classId(classId), m_members(members)  { }
+	void unparse(std::ostream& out, int indent) override;
+	private:
+	IDNode* m_classId; 
+	std::list<DeclNode * > * m_members;
 };
 
 class LocNode : public ExpNode{
@@ -316,13 +319,13 @@ private:
 
 class FnDeclNode : public DeclNode{
 public:
-	FnDeclNode(const Position * p, TypeNode * type, IDNode * id, std::list<FormalDeclNode * > * paramIn, std::list<StmtNode * > * funcBody)
-	: DeclNode(p), myType(type), myId(id), parameters(paramIn), functionBody(funcBody) { }
+	FnDeclNode(const Position * p, IDNode * id, std::list<FormalDeclNode * > * paramIn, TypeNode* type, std::list<StmtNode * > * funcBody)
+	: DeclNode(p), myId(id), parameters(paramIn),  myType(type), functionBody(funcBody) { }
 	void unparse(std::ostream& out, int indent) override;
 private:
-	TypeNode * myType;
 	IDNode * myId;
 	std::list<FormalDeclNode * > *parameters;
+	TypeNode * myType;
 	std::list<StmtNode * > *functionBody;
 };
 

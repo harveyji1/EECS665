@@ -589,7 +589,7 @@ namespace drewno_mars {
           switch (yyn)
             {
   case 2: // program: globals
-#line 156 "drewno_mars.yy"
+#line 180 "drewno_mars.yy"
                   {
 		  (yylhs.value.transProgram) = new ProgramNode((yystack_[0].value.transDeclList));
 		  *root = (yylhs.value.transProgram);
@@ -598,7 +598,7 @@ namespace drewno_mars {
     break;
 
   case 3: // globals: globals decl
-#line 162 "drewno_mars.yy"
+#line 186 "drewno_mars.yy"
                   { 
 		  (yylhs.value.transDeclList) = (yystack_[1].value.transDeclList);
 		  DeclNode * declNode = (yystack_[0].value.transDecl);
@@ -608,7 +608,7 @@ namespace drewno_mars {
     break;
 
   case 4: // globals: %empty
-#line 168 "drewno_mars.yy"
+#line 192 "drewno_mars.yy"
                   {
 		  (yylhs.value.transDeclList) = new std::list<DeclNode *>();
 		  }
@@ -616,7 +616,7 @@ namespace drewno_mars {
     break;
 
   case 5: // decl: varDecl SEMICOL
-#line 173 "drewno_mars.yy"
+#line 197 "drewno_mars.yy"
                   {
 		  (yylhs.value.transDecl) = (yystack_[1].value.transVarDecl);
 		  }
@@ -624,482 +624,631 @@ namespace drewno_mars {
     break;
 
   case 6: // decl: classDecl
-#line 176 "drewno_mars.yy"
-                            { }
+#line 200 "drewno_mars.yy"
+                            { (yylhs.value.transDecl) = (yystack_[0].value.transClassDefn); }
 #line 630 "parser.cc"
     break;
 
   case 7: // decl: fnDecl
-#line 177 "drewno_mars.yy"
-                         { }
+#line 201 "drewno_mars.yy"
+                         { (yylhs.value.transDecl) = (yystack_[0].value.transFnDecl); }
 #line 636 "parser.cc"
     break;
 
   case 8: // varDecl: id COLON type
-#line 180 "drewno_mars.yy"
+#line 204 "drewno_mars.yy"
                   {
 		  const Position * p;
-		  p = new Position((yystack_[2].value.transID)->pos(), (yystack_[1].value.transToken)->pos());
+		  p = new Position((yystack_[2].value.transID)->pos(), (yystack_[0].value.transType)->pos());
 		  (yylhs.value.transVarDecl) = new VarDeclNode(p, (yystack_[2].value.transID), (yystack_[0].value.transType));
 		  }
 #line 646 "parser.cc"
     break;
 
   case 9: // varDecl: id COLON type ASSIGN exp
-#line 186 "drewno_mars.yy"
+#line 210 "drewno_mars.yy"
                   {
+			const Position * p;
+			p = new Position((yystack_[4].value.transID)->pos(), (yystack_[0].value.transExp)->pos());
+			(yylhs.value.transVarDecl) = new VarDeclNode(p, (yystack_[4].value.transID), (yystack_[2].value.transType), (yystack_[0].value.transExp));
 		  }
-#line 653 "parser.cc"
+#line 656 "parser.cc"
     break;
 
   case 10: // type: primType
-#line 190 "drewno_mars.yy"
+#line 217 "drewno_mars.yy"
                   {
 		  (yylhs.value.transType) = (yystack_[0].value.transType);
 		  }
-#line 661 "parser.cc"
+#line 664 "parser.cc"
     break;
 
   case 11: // type: id
-#line 194 "drewno_mars.yy"
+#line 221 "drewno_mars.yy"
                   {
+		   (yylhs.value.transType) = new ClassTypeNode((yystack_[0].value.transID)->pos());
 		  }
-#line 668 "parser.cc"
+#line 672 "parser.cc"
     break;
 
   case 12: // type: PERFECT primType
-#line 197 "drewno_mars.yy"
+#line 225 "drewno_mars.yy"
                   {
-		  }
-#line 675 "parser.cc"
-    break;
-
-  case 13: // type: PERFECT id
-#line 200 "drewno_mars.yy"
-                  {
+			const Position * p;
+			p = new Position((yystack_[1].value.transToken)->pos(), (yystack_[0].value.transType)->pos());
+			(yylhs.value.transType) = new PerfectTypeNode(p);
 		  }
 #line 682 "parser.cc"
     break;
 
+  case 13: // type: PERFECT id
+#line 231 "drewno_mars.yy"
+                  {
+			const Position * p;
+			p = new Position((yystack_[1].value.transToken)->pos(), (yystack_[0].value.transID)->pos());
+			(yylhs.value.transType) = new PerfectTypeNode(p);
+		  }
+#line 692 "parser.cc"
+    break;
+
   case 14: // primType: INT
-#line 204 "drewno_mars.yy"
+#line 238 "drewno_mars.yy"
                   { 
 		  (yylhs.value.transType) = new IntTypeNode((yystack_[0].value.transToken)->pos());
 		  }
-#line 690 "parser.cc"
+#line 700 "parser.cc"
     break;
 
   case 15: // primType: BOOL
-#line 208 "drewno_mars.yy"
+#line 242 "drewno_mars.yy"
                   {
+			(yylhs.value.transType) = new BoolTypeNode((yystack_[0].value.transToken)->pos());
 		  }
-#line 697 "parser.cc"
+#line 708 "parser.cc"
     break;
 
   case 16: // primType: VOID
-#line 211 "drewno_mars.yy"
+#line 246 "drewno_mars.yy"
                   {
+			(yylhs.value.transType) = new VoidTypeNode((yystack_[0].value.transToken)->pos());
 		  }
-#line 704 "parser.cc"
+#line 716 "parser.cc"
     break;
 
   case 17: // classDecl: id COLON CLASS LCURLY classBody RCURLY SEMICOL
-#line 215 "drewno_mars.yy"
+#line 251 "drewno_mars.yy"
                   {
+			const Position * p;
+			p = new Position((yystack_[6].value.transID)->pos(), (yystack_[0].value.transToken)->pos());
+			(yylhs.value.transClassDefn) = new ClassDefnNode(p, (yystack_[6].value.transID), (yystack_[2].value.transDeclList));
 		  }
-#line 711 "parser.cc"
+#line 726 "parser.cc"
     break;
 
   case 18: // classBody: classBody varDecl SEMICOL
-#line 219 "drewno_mars.yy"
+#line 258 "drewno_mars.yy"
                   {
+			//how would I do this?
 		  }
-#line 718 "parser.cc"
+#line 734 "parser.cc"
     break;
 
   case 19: // classBody: classBody fnDecl
-#line 222 "drewno_mars.yy"
+#line 262 "drewno_mars.yy"
                   {
+			//how would I do this?
 		  }
-#line 725 "parser.cc"
+#line 742 "parser.cc"
     break;
 
   case 20: // classBody: %empty
-#line 225 "drewno_mars.yy"
+#line 266 "drewno_mars.yy"
                   {
 		  }
-#line 732 "parser.cc"
+#line 749 "parser.cc"
     break;
 
   case 21: // fnDecl: id COLON LPAREN formals RPAREN type LCURLY stmtList RCURLY
-#line 229 "drewno_mars.yy"
+#line 270 "drewno_mars.yy"
                   {
+			const Position * p;
+			p = new Position((yystack_[8].value.transID)->pos(), (yystack_[0].value.transToken)->pos());
+			(yylhs.value.transFnDecl) = new FnDeclNode(p, (yystack_[8].value.transID), (yystack_[5].value.transFormalDeclList), (yystack_[3].value.transType), (yystack_[2].value.transToken))
 		  }
-#line 739 "parser.cc"
+#line 759 "parser.cc"
     break;
 
   case 22: // formals: %empty
-#line 233 "drewno_mars.yy"
+#line 277 "drewno_mars.yy"
                   {
-		  }
-#line 746 "parser.cc"
-    break;
-
-  case 23: // formals: formalsList
-#line 236 "drewno_mars.yy"
-                  {
-		  }
-#line 753 "parser.cc"
-    break;
-
-  case 24: // formalsList: formalDecl
-#line 240 "drewno_mars.yy"
-                  {
-		  }
-#line 760 "parser.cc"
-    break;
-
-  case 25: // formalsList: formalsList COMMA formalDecl
-#line 243 "drewno_mars.yy"
-                  {
+			(yylhs.value.transFormalDeclList) = new std::list<FormalDeclNode *>();
 		  }
 #line 767 "parser.cc"
     break;
 
-  case 26: // formalDecl: id COLON type
-#line 247 "drewno_mars.yy"
+  case 23: // formals: formalsList
+#line 281 "drewno_mars.yy"
                   {
+			(yylhs.value.transFormalDeclList) = (yystack_[0].value.transFormalDeclList);
 		  }
-#line 774 "parser.cc"
+#line 775 "parser.cc"
     break;
 
-  case 27: // stmtList: %empty
-#line 251 "drewno_mars.yy"
+  case 24: // formalsList: formalDecl
+#line 286 "drewno_mars.yy"
                   {
-	   	  }
-#line 781 "parser.cc"
+		  std::list<drewno_mars::FormalDeclNode *> formalDeclsList = new std::list<drewno_mars::FormalDeclNode *>
+		  FormalDeclNode * fdeclNode = (yystack_[0].value.transFormalDecl);
+		  (yylhs.value.transFormalDeclList)->push_back(fdeclNode);
+		  }
+#line 785 "parser.cc"
     break;
 
-  case 28: // stmtList: stmtList stmt SEMICOL
-#line 254 "drewno_mars.yy"
+  case 25: // formalsList: formalsList COMMA formalDecl
+#line 292 "drewno_mars.yy"
                   {
-	  	  }
-#line 788 "parser.cc"
-    break;
-
-  case 29: // stmtList: stmtList blockStmt
-#line 257 "drewno_mars.yy"
-                  {
-	  	  }
+		  (yylhs.value.transFormalDeclList) = (yystack_[2].value.transFormalDeclList);
+		  FormalDeclNode * fdeclNode = (yystack_[0].value.transFormalDecl);
+		  (yylhs.value.transFormalDeclList)->push_back(fdeclNode);
+		  }
 #line 795 "parser.cc"
     break;
 
-  case 30: // blockStmt: WHILE LPAREN exp RPAREN LCURLY stmtList RCURLY
-#line 261 "drewno_mars.yy"
+  case 26: // formalDecl: id COLON type
+#line 299 "drewno_mars.yy"
                   {
+			const Position * p;
+			p = new Position((yystack_[2].value.transID)->pos(), (yystack_[0].value.transType)->pos());
+			(yylhs.value.transFormalDecl) = new FormalDeclNode(p, (yystack_[2].value.transID), (yystack_[0].value.transType));
 		  }
-#line 802 "parser.cc"
+#line 805 "parser.cc"
     break;
 
-  case 31: // blockStmt: IF LPAREN exp RPAREN LCURLY stmtList RCURLY
-#line 264 "drewno_mars.yy"
+  case 27: // stmtList: %empty
+#line 306 "drewno_mars.yy"
                   {
-		  }
-#line 809 "parser.cc"
+			(yylhs.value.transStmtList) = new std::list<StmtNode *>();
+	   	  }
+#line 813 "parser.cc"
     break;
 
-  case 32: // blockStmt: IF LPAREN exp RPAREN LCURLY stmtList RCURLY ELSE LCURLY stmtList RCURLY
-#line 267 "drewno_mars.yy"
+  case 28: // stmtList: stmtList stmt SEMICOL
+#line 310 "drewno_mars.yy"
                   {
-		  }
-#line 816 "parser.cc"
-    break;
-
-  case 33: // stmt: varDecl
-#line 271 "drewno_mars.yy"
-                  {
-		  }
+			(yylhs.value.transStmtList) = (yystack_[2].value.transStmtList);
+		  	StmtNode * stmtNode = (yystack_[1].value.transStmt);
+		  	(yylhs.value.transStmtList)->push_back(stmtNode);
+	  	  }
 #line 823 "parser.cc"
     break;
 
-  case 34: // stmt: loc ASSIGN exp
-#line 274 "drewno_mars.yy"
+  case 29: // stmtList: stmtList blockStmt
+#line 316 "drewno_mars.yy"
                   {
+			(yylhs.value.transStmtList) = (yystack_[1].value.transStmtList);
+		  	StmtNode * stmtNode = (yystack_[0].value.transStmt);
+		  	(yylhs.value.transStmtList)->push_back(stmtNode);
+	  	  }
+#line 833 "parser.cc"
+    break;
+
+  case 30: // blockStmt: WHILE LPAREN exp RPAREN LCURLY stmtList RCURLY
+#line 323 "drewno_mars.yy"
+                  {
+			const Position * p;
+			p = new Position((yystack_[6].value.transToken)->pos(), (yystack_[0].value.transToken)->pos());
+			(yylhs.value.transStmt) = new WhileStmtNode(p, (yystack_[4].value.transExp), (yystack_[1].value.transStmtList));
 		  }
-#line 830 "parser.cc"
+#line 843 "parser.cc"
+    break;
+
+  case 31: // blockStmt: IF LPAREN exp RPAREN LCURLY stmtList RCURLY
+#line 329 "drewno_mars.yy"
+                  {
+			const Position * p;
+			p = new Position((yystack_[6].value.transToken)->pos(), (yystack_[1].value.transStmtList)->pos());
+			(yylhs.value.transStmt) = new IfStmtNode(p, (yystack_[4].value.transExp), (yystack_[2].value.transToken));
+		  }
+#line 853 "parser.cc"
+    break;
+
+  case 32: // blockStmt: IF LPAREN exp RPAREN LCURLY stmtList RCURLY ELSE LCURLY stmtList RCURLY
+#line 335 "drewno_mars.yy"
+                  {
+			const Position * p;
+			p = new Position((yystack_[10].value.transToken)->pos(), (yystack_[0].value.transToken)->pos());
+			(yylhs.value.transStmt) = new IfStmtNode(p, (yystack_[8].value.transExp), (yystack_[5].value.transStmtList), (yystack_[1].value.transStmtList));
+		  }
+#line 863 "parser.cc"
+    break;
+
+  case 33: // stmt: varDecl
+#line 342 "drewno_mars.yy"
+                  {
+			(yylhs.value.transStmt) = (yystack_[0].value.transVarDecl)
+		  }
+#line 871 "parser.cc"
+    break;
+
+  case 34: // stmt: loc ASSIGN exp
+#line 346 "drewno_mars.yy"
+                  {
+			const Position * p;
+			p = new Position((yystack_[2].value.transLoc)->pos(), (yystack_[0].value.transExp)->pos());
+			(yylhs.value.transStmt) = new StmtNode(p, (yystack_[2].value.transLoc), (yystack_[0].value.transExp));
+		  }
+#line 881 "parser.cc"
     break;
 
   case 35: // stmt: loc POSTDEC
-#line 277 "drewno_mars.yy"
+#line 352 "drewno_mars.yy"
                   {
+			const Position * p;
+			p = new Position((yystack_[1].value.transLoc)->pos(), (yystack_[0].value.transToken)->pos());
+			(yylhs.value.transStmt) = new PostDecNode(p, (yystack_[1].value.transLoc));
 		  }
-#line 837 "parser.cc"
+#line 891 "parser.cc"
     break;
 
   case 36: // stmt: loc POSTINC
-#line 280 "drewno_mars.yy"
+#line 358 "drewno_mars.yy"
                   {
+			const Position * p;
+			p = new Position((yystack_[1].value.transLoc)->pos(), (yystack_[0].value.transToken)->pos());
+			(yylhs.value.transStmt) = new PostIncNode(p, (yystack_[1].value.transLoc));
 		  }
-#line 844 "parser.cc"
+#line 901 "parser.cc"
     break;
 
   case 37: // stmt: GIVE exp
-#line 283 "drewno_mars.yy"
+#line 364 "drewno_mars.yy"
                   {
+			const Position * p;
+			p = new Position((yystack_[1].value.transToken)->pos(), (yystack_[0].value.transExp)->pos());
+			(yylhs.value.transStmt) = new GiveStmtNode(p, (yystack_[0].value.transExp));
 		  }
-#line 851 "parser.cc"
+#line 911 "parser.cc"
     break;
 
   case 38: // stmt: TAKE loc
-#line 286 "drewno_mars.yy"
+#line 370 "drewno_mars.yy"
                   {
-		  }
-#line 858 "parser.cc"
-    break;
-
-  case 39: // stmt: RETURN exp
-#line 289 "drewno_mars.yy"
-                  {
-		  }
-#line 865 "parser.cc"
-    break;
-
-  case 40: // stmt: RETURN
-#line 292 "drewno_mars.yy"
-                  {
-		  }
-#line 872 "parser.cc"
-    break;
-
-  case 41: // stmt: EXIT
-#line 295 "drewno_mars.yy"
-                  {
-		  }
-#line 879 "parser.cc"
-    break;
-
-  case 42: // stmt: callExp
-#line 298 "drewno_mars.yy"
-                  { 
-		  }
-#line 886 "parser.cc"
-    break;
-
-  case 43: // exp: exp DASH exp
-#line 302 "drewno_mars.yy"
-                  {
-		  }
-#line 893 "parser.cc"
-    break;
-
-  case 44: // exp: exp CROSS exp
-#line 305 "drewno_mars.yy"
-                  {
-		  }
-#line 900 "parser.cc"
-    break;
-
-  case 45: // exp: exp STAR exp
-#line 308 "drewno_mars.yy"
-                  {
-		  }
-#line 907 "parser.cc"
-    break;
-
-  case 46: // exp: exp SLASH exp
-#line 311 "drewno_mars.yy"
-                  {
-		  }
-#line 914 "parser.cc"
-    break;
-
-  case 47: // exp: exp AND exp
-#line 314 "drewno_mars.yy"
-                  {
+			const Position * p;
+			p = new Position((yystack_[1].value.transToken)->pos(), (yystack_[0].value.transLoc)->pos());
+			(yylhs.value.transStmt) = new TakeStmtNode(p, (yystack_[0].value.transLoc));
 		  }
 #line 921 "parser.cc"
     break;
 
+  case 39: // stmt: RETURN exp
+#line 376 "drewno_mars.yy"
+                  {
+			const Position * p;
+			p = new Position((yystack_[1].value.transToken)->pos(), (yystack_[0].value.transExp)->pos());
+			(yylhs.value.transStmt) = new ReturnStmtNode(p, (yystack_[0].value.transExp));
+		  }
+#line 931 "parser.cc"
+    break;
+
+  case 40: // stmt: RETURN
+#line 382 "drewno_mars.yy"
+                  {
+			const Position * p;
+			p = new Position((yystack_[0].value.transToken)->pos());
+			(yylhs.value.transStmt) = new ReturnStmtNode(p);
+		  }
+#line 941 "parser.cc"
+    break;
+
+  case 41: // stmt: EXIT
+#line 388 "drewno_mars.yy"
+                  {
+			const Position * p;
+			p = new Position((yystack_[0].value.transToken)->pos());
+			(yylhs.value.transStmt) = new ExitStmtNode(p);
+		  }
+#line 951 "parser.cc"
+    break;
+
+  case 42: // stmt: callExp
+#line 394 "drewno_mars.yy"
+                  { 
+			(yylhs.value.transStmt) = (yystack_[0].value.transCallStmt)
+		  }
+#line 959 "parser.cc"
+    break;
+
+  case 43: // exp: exp DASH exp
+#line 399 "drewno_mars.yy"
+                  {
+			const Position * p;
+			p = new Position((yystack_[2].value.transExp)->pos(), (yystack_[0].value.transExp)->pos());
+			(yylhs.value.transExp) = new MinusNode(p, (yystack_[2].value.transExp), (yystack_[0].value.transExp));
+		  }
+#line 969 "parser.cc"
+    break;
+
+  case 44: // exp: exp CROSS exp
+#line 405 "drewno_mars.yy"
+                  {
+			const Position * p;
+			p = new Position((yystack_[2].value.transExp)->pos(), (yystack_[0].value.transExp)->pos());
+			(yylhs.value.transExp) = new PlusNode(p, (yystack_[2].value.transExp), (yystack_[0].value.transExp));
+		  }
+#line 979 "parser.cc"
+    break;
+
+  case 45: // exp: exp STAR exp
+#line 411 "drewno_mars.yy"
+                  {
+			const Position * p;
+			p = new Position((yystack_[2].value.transExp)->pos(), (yystack_[0].value.transExp)->pos());
+			(yylhs.value.transExp) = new TimesNode(p, (yystack_[2].value.transExp), (yystack_[0].value.transExp));
+		  }
+#line 989 "parser.cc"
+    break;
+
+  case 46: // exp: exp SLASH exp
+#line 417 "drewno_mars.yy"
+                  {
+			const Position * p;
+			p = new Position((yystack_[2].value.transExp)->pos(), (yystack_[0].value.transExp)->pos());
+			(yylhs.value.transExp) = new DivNode(p, (yystack_[2].value.transExp), (yystack_[0].value.transExp));
+		  }
+#line 999 "parser.cc"
+    break;
+
+  case 47: // exp: exp AND exp
+#line 423 "drewno_mars.yy"
+                  {
+			const Position * p;
+			p = new Position((yystack_[2].value.transExp)->pos(), (yystack_[0].value.transExp)->pos());
+			(yylhs.value.transExp) = new AndNode(p, (yystack_[2].value.transExp), (yystack_[0].value.transExp));
+		  }
+#line 1009 "parser.cc"
+    break;
+
   case 48: // exp: exp OR exp
-#line 317 "drewno_mars.yy"
+#line 429 "drewno_mars.yy"
                   {
-		  }
-#line 928 "parser.cc"
-    break;
-
-  case 49: // exp: exp EQUALS exp
-#line 320 "drewno_mars.yy"
-                  {
-		  }
-#line 935 "parser.cc"
-    break;
-
-  case 50: // exp: exp NOTEQUALS exp
-#line 323 "drewno_mars.yy"
-                  {
-		  }
-#line 942 "parser.cc"
-    break;
-
-  case 51: // exp: exp GREATER exp
-#line 326 "drewno_mars.yy"
-                  {
-		  }
-#line 949 "parser.cc"
-    break;
-
-  case 52: // exp: exp GREATEREQ exp
-#line 329 "drewno_mars.yy"
-                  {
-		  }
-#line 956 "parser.cc"
-    break;
-
-  case 53: // exp: exp LESS exp
-#line 332 "drewno_mars.yy"
-                  {
-		  }
-#line 963 "parser.cc"
-    break;
-
-  case 54: // exp: exp LESSEQ exp
-#line 335 "drewno_mars.yy"
-                  {
-		  }
-#line 970 "parser.cc"
-    break;
-
-  case 55: // exp: NOT exp
-#line 338 "drewno_mars.yy"
-                  {
-		  }
-#line 977 "parser.cc"
-    break;
-
-  case 56: // exp: DASH term
-#line 341 "drewno_mars.yy"
-                  {
-		  }
-#line 984 "parser.cc"
-    break;
-
-  case 57: // exp: term
-#line 344 "drewno_mars.yy"
-                  {
-		  }
-#line 991 "parser.cc"
-    break;
-
-  case 58: // callExp: loc LPAREN RPAREN
-#line 348 "drewno_mars.yy"
-                  {
-		  }
-#line 998 "parser.cc"
-    break;
-
-  case 59: // callExp: loc LPAREN actualsList RPAREN
-#line 351 "drewno_mars.yy"
-                  {
-		  }
-#line 1005 "parser.cc"
-    break;
-
-  case 60: // actualsList: exp
-#line 355 "drewno_mars.yy"
-                  {
-		  }
-#line 1012 "parser.cc"
-    break;
-
-  case 61: // actualsList: actualsList COMMA exp
-#line 358 "drewno_mars.yy"
-                  {
+			const Position * p;
+			p = new Position((yystack_[2].value.transExp)->pos(), (yystack_[0].value.transExp)->pos());
+			(yylhs.value.transExp) = new OrNode(p, (yystack_[2].value.transExp), (yystack_[0].value.transExp));
 		  }
 #line 1019 "parser.cc"
     break;
 
-  case 62: // term: loc
-#line 362 "drewno_mars.yy"
-                  { 
+  case 49: // exp: exp EQUALS exp
+#line 435 "drewno_mars.yy"
+                  {
+			const Position * p;
+			p = new Position((yystack_[2].value.transExp)->pos(), (yystack_[0].value.transExp)->pos());
+			(yylhs.value.transExp) = new EqualsNode(p, (yystack_[2].value.transExp), (yystack_[0].value.transExp));
 		  }
-#line 1026 "parser.cc"
+#line 1029 "parser.cc"
     break;
 
-  case 63: // term: INTLITERAL
-#line 365 "drewno_mars.yy"
+  case 50: // exp: exp NOTEQUALS exp
+#line 441 "drewno_mars.yy"
                   {
+			const Position * p;
+			p = new Position((yystack_[2].value.transExp)->pos(), (yystack_[0].value.transExp)->pos());
+			(yylhs.value.transExp) = new NotEqalsNode(p, (yystack_[2].value.transExp), (yystack_[0].value.transExp));
 		  }
-#line 1033 "parser.cc"
+#line 1039 "parser.cc"
     break;
 
-  case 64: // term: STRINGLITERAL
-#line 368 "drewno_mars.yy"
+  case 51: // exp: exp GREATER exp
+#line 447 "drewno_mars.yy"
                   {
+			const Position * p;
+			p = new Position((yystack_[2].value.transExp)->pos(), (yystack_[0].value.transExp)->pos());
+			(yylhs.value.transExp) = new GreaterNode(p, (yystack_[2].value.transExp), (yystack_[0].value.transExp));
 		  }
-#line 1040 "parser.cc"
+#line 1049 "parser.cc"
     break;
 
-  case 65: // term: TRUE
-#line 371 "drewno_mars.yy"
+  case 52: // exp: exp GREATEREQ exp
+#line 453 "drewno_mars.yy"
                   {
+			const Position * p;
+			p = new Position((yystack_[2].value.transExp)->pos(), (yystack_[0].value.transExp)->pos());
+			(yylhs.value.transExp) = new GreaterEqNode(p, (yystack_[2].value.transExp), (yystack_[0].value.transExp));
 		  }
-#line 1047 "parser.cc"
+#line 1059 "parser.cc"
     break;
 
-  case 66: // term: FALSE
-#line 374 "drewno_mars.yy"
+  case 53: // exp: exp LESS exp
+#line 459 "drewno_mars.yy"
                   {
+			const Position * p;
+			p = new Position((yystack_[2].value.transExp)->pos(), (yystack_[0].value.transExp)->pos());
+			(yylhs.value.transExp) = new LessNode(p, (yystack_[2].value.transExp), (yystack_[0].value.transExp));
 		  }
-#line 1054 "parser.cc"
+#line 1069 "parser.cc"
     break;
 
-  case 67: // term: MAGIC
-#line 377 "drewno_mars.yy"
+  case 54: // exp: exp LESSEQ exp
+#line 465 "drewno_mars.yy"
                   {
+			const Position * p;
+			p = new Position((yystack_[2].value.transExp)->pos(), (yystack_[0].value.transExp)->pos());
+			(yylhs.value.transExp) = new LessEqNode(p, (yystack_[2].value.transExp), (yystack_[0].value.transExp));
 		  }
-#line 1061 "parser.cc"
+#line 1079 "parser.cc"
     break;
 
-  case 68: // term: LPAREN exp RPAREN
-#line 380 "drewno_mars.yy"
+  case 55: // exp: NOT exp
+#line 471 "drewno_mars.yy"
                   {
+			const Position * p;
+			p = new Position((yystack_[1].value.transToken)->pos(), (yystack_[0].value.transExp)->pos());
+			(yylhs.value.transExp) = new NotNode(p, (yystack_[0].value.transExp));
 		  }
-#line 1068 "parser.cc"
+#line 1089 "parser.cc"
     break;
 
-  case 69: // term: callExp
-#line 383 "drewno_mars.yy"
+  case 56: // exp: DASH term
+#line 477 "drewno_mars.yy"
                   {
-		  }
-#line 1075 "parser.cc"
-    break;
-
-  case 70: // loc: id
-#line 387 "drewno_mars.yy"
-                  {
-		  (yylhs.value.transLoc) = (yystack_[0].value.transID);
-		  }
-#line 1083 "parser.cc"
-    break;
-
-  case 71: // loc: loc POSTDEC id
-#line 391 "drewno_mars.yy"
-                  {
-		  }
-#line 1090 "parser.cc"
-    break;
-
-  case 72: // id: ID
-#line 395 "drewno_mars.yy"
-                  {
-		  const Position * pos = (yystack_[0].value.transIDToken)->pos();
-		  (yylhs.value.transID) = new IDNode(pos, (yystack_[0].value.transIDToken)->value());
+			const Position * p;
+			p = new Position((yystack_[1].value.transToken)->pos(), (yystack_[0].value.transType)->pos());
+			(yylhs.value.transExp) = new NegNode(p, (yystack_[0].value.transType));
 		  }
 #line 1099 "parser.cc"
     break;
 
+  case 57: // exp: term
+#line 483 "drewno_mars.yy"
+                  {
+			(yylhs.value.transExp) = (yystack_[0].value.transType);
+		  }
+#line 1107 "parser.cc"
+    break;
 
-#line 1103 "parser.cc"
+  case 58: // callExp: loc LPAREN RPAREN
+#line 488 "drewno_mars.yy"
+                  {
+			const Position * p;
+			p = new Position((yystack_[2].value.transLoc)->pos(), (yystack_[0].value.transToken)->pos());
+			(yylhs.value.transCallStmt) = new CallExpNode(p, (yystack_[2].value.transLoc));
+		  }
+#line 1117 "parser.cc"
+    break;
+
+  case 59: // callExp: loc LPAREN actualsList RPAREN
+#line 494 "drewno_mars.yy"
+                  {
+			const Position * p;
+			p = new Position((yystack_[3].value.transLoc)->pos(), (yystack_[0].value.transToken)->pos());
+			(yylhs.value.transCallStmt) = new CallExpNode(p, (yystack_[3].value.transLoc), (yystack_[2].value.transToken));
+		  }
+#line 1127 "parser.cc"
+    break;
+
+  case 60: // actualsList: exp
+#line 501 "drewno_mars.yy"
+                  {
+			(yylhs.value.transExpList) = (yystack_[0].value.transExp)
+		  }
+#line 1135 "parser.cc"
+    break;
+
+  case 61: // actualsList: actualsList COMMA exp
+#line 505 "drewno_mars.yy"
+                  {
+			const Position * p;
+			p = new Position((yystack_[2].value.transExpList)->pos(), (yystack_[0].value.transExp)->pos());
+			(yylhs.value.transExpList) = new IfStmtNode(p, (yystack_[2].value.transExpList), (yystack_[0].value.transExp));
+		  }
+#line 1145 "parser.cc"
+    break;
+
+  case 62: // term: loc
+#line 512 "drewno_mars.yy"
+                  { 
+			(yylhs.value.transType) = (yystack_[0].value.transLoc);
+		  }
+#line 1153 "parser.cc"
+    break;
+
+  case 63: // term: INTLITERAL
+#line 516 "drewno_mars.yy"
+                  {
+			const Position * p;
+			p = new Position((yystack_[0].value.transIntToken)->pos());
+			(yylhs.value.transType) = new IntLitNode(p);
+		  }
+#line 1163 "parser.cc"
+    break;
+
+  case 64: // term: STRINGLITERAL
+#line 522 "drewno_mars.yy"
+                  {
+			const Position * p;
+			p = new Position((yystack_[0].value.transStrToken)->pos());
+			(yylhs.value.transType) = new StrLitNode(p);
+		  }
+#line 1173 "parser.cc"
+    break;
+
+  case 65: // term: TRUE
+#line 528 "drewno_mars.yy"
+                  {
+			const Position * p;
+			p = new Position((yystack_[0].value.transToken)->pos());
+			(yylhs.value.transType) = new TrueNode(p);
+		  }
+#line 1183 "parser.cc"
+    break;
+
+  case 66: // term: FALSE
+#line 534 "drewno_mars.yy"
+                  {
+			const Position * p;
+			p = new Position((yystack_[0].value.transToken)->pos());
+			(yylhs.value.transType) = new FalseNode(p);
+		  }
+#line 1193 "parser.cc"
+    break;
+
+  case 67: // term: MAGIC
+#line 540 "drewno_mars.yy"
+                  {
+			const Position * p;
+			p = new Position((yystack_[0].value.transToken)->pos());
+			(yylhs.value.transType) = new MagicNode(p);
+		  }
+#line 1203 "parser.cc"
+    break;
+
+  case 68: // term: LPAREN exp RPAREN
+#line 546 "drewno_mars.yy"
+                  {
+			const Position * p;
+			p = new Position((yystack_[2].value.transToken)->pos(), (yystack_[0].value.transToken)->pos());
+			(yylhs.value.transType) = new ExpNode(p, (yystack_[1].value.transExp));
+		  }
+#line 1213 "parser.cc"
+    break;
+
+  case 69: // term: callExp
+#line 552 "drewno_mars.yy"
+                  {
+			(yylhs.value.transType) = (yystack_[0].value.transCallStmt)
+		  }
+#line 1221 "parser.cc"
+    break;
+
+  case 70: // loc: id
+#line 557 "drewno_mars.yy"
+                  {
+		  (yylhs.value.transLoc) = (yystack_[0].value.transID);
+		  }
+#line 1229 "parser.cc"
+    break;
+
+  case 71: // loc: loc POSTDEC id
+#line 561 "drewno_mars.yy"
+                  {
+			const Position * p;
+			p = new Position((yystack_[2].value.transLoc)->pos(), (yystack_[0].value.transID)->pos());
+			(yylhs.value.transLoc) = new MemberFieldExpNode(p, (yystack_[0].value.transID));
+		  }
+#line 1239 "parser.cc"
+    break;
+
+  case 72: // id: ID
+#line 568 "drewno_mars.yy"
+                  {
+		  const Position * pos = (yystack_[0].value.transIDToken)->pos();
+		  (yylhs.value.transID) = new IDNode(pos, (yystack_[0].value.transIDToken)->value());
+		  }
+#line 1248 "parser.cc"
+    break;
+
+
+#line 1252 "parser.cc"
 
             default:
               break;
@@ -1659,14 +1808,14 @@ namespace drewno_mars {
   const short
   Parser::yyrline_[] =
   {
-       0,   155,   155,   161,   168,   172,   176,   177,   179,   185,
-     189,   193,   196,   199,   203,   207,   210,   214,   218,   221,
-     225,   228,   233,   235,   239,   242,   246,   251,   253,   256,
-     260,   263,   266,   270,   273,   276,   279,   282,   285,   288,
-     291,   294,   297,   301,   304,   307,   310,   313,   316,   319,
-     322,   325,   328,   331,   334,   337,   340,   343,   347,   350,
-     354,   357,   361,   364,   367,   370,   373,   376,   379,   382,
-     386,   390,   394
+       0,   179,   179,   185,   192,   196,   200,   201,   203,   209,
+     216,   220,   224,   230,   237,   241,   245,   250,   257,   261,
+     266,   269,   277,   280,   285,   291,   298,   306,   309,   315,
+     322,   328,   334,   341,   345,   351,   357,   363,   369,   375,
+     381,   387,   393,   398,   404,   410,   416,   422,   428,   434,
+     440,   446,   452,   458,   464,   470,   476,   482,   487,   493,
+     500,   504,   511,   515,   521,   527,   533,   539,   545,   551,
+     556,   560,   567
   };
 
   void
@@ -1749,9 +1898,9 @@ namespace drewno_mars {
 
 #line 5 "drewno_mars.yy"
 } // drewno_mars
-#line 1753 "parser.cc"
+#line 1902 "parser.cc"
 
-#line 400 "drewno_mars.yy"
+#line 573 "drewno_mars.yy"
 
 
 void drewno_mars::Parser::error(const std::string& msg){

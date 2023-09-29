@@ -219,7 +219,7 @@ type		: primType
 		  }
 		| id
 		  {
-		  $$ = $1;
+		   $$ = new ClassTypeNode($1->pos());
 		  }
 		| PERFECT primType
 		  {
@@ -256,12 +256,11 @@ classDecl	: id COLON CLASS LCURLY classBody RCURLY SEMICOL
 
 classBody	: classBody varDecl SEMICOL
 		  {
-			const Position * p;
-			p = new Position($1->pos(), $3->pos());
-			$$ = new ClassDefnNode(p);
+			//how would I do this?
 		  }
 		| classBody fnDecl
 		  {
+			//how would I do this?
 		  }
 		| /* epsilon */
 		  {

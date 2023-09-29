@@ -228,12 +228,23 @@ namespace drewno_mars {
    drewno_mars::ProgramNode*                   transProgram;
    drewno_mars::DeclNode *                     transDecl;
    std::list<drewno_mars::DeclNode *> *        transDeclList;
+   std::list<drewno_mars::ExpNode *> *         transExpList;
+   std::list<drewno_mars::StmtNode *> *        transStmtList;
+   std::list<drewno_mars::FormalDeclNode *> *  transFormalDeclList;
    drewno_mars::VarDeclNode *                  transVarDecl;
    drewno_mars::TypeNode *                     transType;
    drewno_mars::LocNode *                      transLoc;
    drewno_mars::IDNode *                       transID;
+   drewno_mars::IntLitToken*				   transIntToken;
+   drewno_mars::StrToken*					   transStrToken;
+   drewno_mars::StmtNode*					   transStmt;	
+   drewno_mars::CallExpNode*				   transCallStmt;	
+   drewno_mars::ExpNode*					   transExp;
+   drewno_mars::ClassDefnNode*				   transClassDefn;
+   drewno_mars::FnDeclNode*				       transFnDecl;
+   drewno_mars::FormalDeclNode *               transFormalDecl;
 
-#line 237 "frontend.hh"
+#line 248 "frontend.hh"
 
     };
 #endif
@@ -905,7 +916,7 @@ namespace drewno_mars {
 
 #line 5 "drewno_mars.yy"
 } // drewno_mars
-#line 909 "frontend.hh"
+#line 920 "frontend.hh"
 
 
 

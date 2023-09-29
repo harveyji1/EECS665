@@ -12,7 +12,7 @@ static void doIndent(std::ostream& out, int indent){
 
 /*
 In this code, the intention is that functions are grouped 
-into files by purpose, rather than by class.
+into files by purpose, rather than by f.
 If you're used to having all of the functions of a class 
 defined in the same file, this style may be a bit disorienting,
 though it is legal. Thus, we can have
@@ -40,12 +40,28 @@ void ProgramNode::unparse(std::ostream& out, int indent){
 	}
 }
 
+void DeclNode::unparse(std::ostream& out, int indent){
+	this->unparse(out,0); //is this right for DeclNodews? Do I even need this
+}
+
 void VarDeclNode::unparse(std::ostream& out, int indent){
 	doIndent(out, indent);
 	this->myID->unparse(out, 0);
 	out << ": ";
 	this->myType->unparse(out, 0);
 	out << ";\n";
+}
+
+void ClassDefnNode::unparse(std::ostream& out, int indent){
+	this->m_classId->unparse(out, 0);
+	out << ":";
+	out << "class";
+	out << "{";
+	for (auto members : *m_members){
+		members->unparse(out, indent);
+	}
+	out << "}";
+	out << ";";
 }
 
 void IDNode::unparse(std::ostream& out, int indent){
@@ -197,7 +213,7 @@ void IntLitNode::unparse(std::ostream& out, int indent){
 	out << this->m_numval;
 }
 
-void IntLitNode::unparse(std::ostream& out, int indent){
+void MagicNode::unparse(std::ostream& out, int indent){
 	out << this->m_magic;
 }
 
@@ -207,18 +223,13 @@ void StrLitNode::unparse(std::ostream& out, int indent){
 
 void NotNode::unparse(std::ostream& out, int indent){
 	doIndent(out, indent);
-	out << "(";
 	out << " ! ";
-	this->m_expr->unparse(out, 0);
-	out << ")";
+
 }
 
 void NegNode::unparse(std::ostream& out, int indent){
 	doIndent(out, indent);
-	out << "(";
 	out << "-";
-	this->m_expr->unparse(out, 0);
-	out << ")";
 }
 
 void CallStmtNode::unparse(std::ostream& out, int indent){
