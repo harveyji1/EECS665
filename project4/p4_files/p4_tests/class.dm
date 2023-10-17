@@ -1,0 +1,3 @@
+student: class{
+    ID: int;
+};

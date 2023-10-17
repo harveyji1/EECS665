@@ -1,0 +1,3 @@
+fn{(int,bool)->int} : (x{int} : int, z{bool} : bool) int  {
+    a{int} : int = 0;
+}

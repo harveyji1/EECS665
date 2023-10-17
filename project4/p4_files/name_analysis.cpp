@@ -47,10 +47,12 @@ bool FnDeclNode::nameAnalysis(SymbolTable * symTab){
 	bool nameAnalysisOk = true;
 	std::string fnType("");
 	std::string comma = "";
+	fnType.append("(");
 	for (auto formal : *myFormals) {
 		fnType.append(comma + formal->getTypeNode()->getType());
 		comma = ",";
 	}
+	fnType.append(")");
 	fnType.append("->" + myRetType->getType());
 
 	SemSymbol * fnDeclSymbol = new SemSymbol(myID->getName(), std::string("fn"), fnType);
@@ -133,5 +135,107 @@ bool IDNode::nameAnalysis(SymbolTable* symTab) {
 		return false;
 	}
 }
+
+bool AssignStmtNode::nameAnalysis(SymbolTable* symTab) {
+	return mySrc->nameAnalysis(symTab);
+}
+
+bool UnaryExpNode::nameAnalysis(SymbolTable* symTab) {
+	return myExp->nameAnalysis(symTab);
+}
+
+bool BinaryExpNode::nameAnalysis(SymbolTable* symTab) {
+	bool nameAnalysisOk = myExp1->nameAnalysis(symTab);
+	if (nameAnalysisOk)
+	{
+		return myExp2->nameAnalysis(symTab);
+	}
+	return false;
+}
+
+bool TakeStmtNode::nameAnalysis(SymbolTable* symTab) {
+	return myDst->nameAnalysis(symTab);
+}
+
+bool GiveStmtNode::nameAnalysis(SymbolTable* symTab) {
+	return mySrc->nameAnalysis(symTab);
+}
+
+bool IfStmtNode::nameAnalysis(SymbolTable* symTab) {
+	bool nameAnalysisOk = myCond->nameAnalysis(symTab);
+	if (nameAnalysisOk)
+	{
+		ScopeTable * ifScope = new ScopeTable();
+		symTab->insert(ifScope);
+		for (auto stmt : *myBody) {
+			nameAnalysisOk = stmt->nameAnalysis(symTab);
+			if (!nameAnalysisOk)
+			{
+				symTab->remove();
+				return false;
+			}
+		}
+		symTab->remove();
+		return true;
+	}
+	return false;
+}
+
+bool IfElseStmtNode::nameAnalysis(SymbolTable* symTab) {
+	bool nameAnalysisOk = myCond->nameAnalysis(symTab);
+	if (nameAnalysisOk)
+	{
+		ScopeTable * ifScope = new ScopeTable();
+		symTab->insert(ifScope);
+		for (auto stmt : *myBodyTrue) {
+			nameAnalysisOk = stmt->nameAnalysis(symTab);
+			if (!nameAnalysisOk)
+			{
+				symTab->remove();
+				return false;
+			}
+		}
+		symTab->remove();
+		ScopeTable * elseScope = new ScopeTable();
+		symTab->insert(elseScope);
+		for (auto stmt : *myBodyFalse) {
+			nameAnalysisOk = stmt->nameAnalysis(symTab);
+			if (!nameAnalysisOk)
+			{
+				symTab->remove();
+				return false;
+			}
+		}
+		symTab->remove();
+		return true;
+	}
+	return false;
+}
+
+bool WhileStmtNode::nameAnalysis(SymbolTable* symTab) {
+	bool nameAnalysisOk = myCond->nameAnalysis(symTab);
+	if (nameAnalysisOk)
+	{
+		ScopeTable * whileScope = new ScopeTable();
+		symTab->insert(whileScope);
+		for (auto stmt : *myBody) {
+			nameAnalysisOk = stmt->nameAnalysis(symTab);
+			if (!nameAnalysisOk)
+			{
+				symTab->remove();
+				return false;
+			}
+		}
+		symTab->remove();
+		return true;
+	}
+	return false;
+}
+
+bool ReturnStmtNode::nameAnalysis(SymbolTable* symTab) {
+	return myExp->nameAnalysis(symTab);
+}
+
+
 
 }
