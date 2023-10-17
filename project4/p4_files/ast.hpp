@@ -99,6 +99,7 @@ public:
 	: DeclNode(p), myID(inID), myMembers(inMembers){ }
 	void unparse(std::ostream& out, int indent) override;
 	IDNode * ID(){ return myID; }
+	bool nameAnalysis(SymbolTable * symTab) override;
 private:
 	IDNode * myID;
 	std::list<DeclNode *> * myMembers;

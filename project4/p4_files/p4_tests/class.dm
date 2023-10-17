@@ -1,3 +1,3 @@
 student: class{
-    ID: int;
+    studentID: int;
 };

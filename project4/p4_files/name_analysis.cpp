@@ -53,7 +53,7 @@ bool FnDeclNode::nameAnalysis(SymbolTable * symTab){
 		comma = ",";
 	}
 	fnType.append(")");
-	fnType.append("->" + myRetType->getType());
+	fnType.append(" -> " + myRetType->getType());
 
 	SemSymbol * fnDeclSymbol = new SemSymbol(myID->getName(), std::string("fn"), fnType);
 	myID->attachSymbol(fnDeclSymbol);
@@ -71,6 +71,37 @@ bool FnDeclNode::nameAnalysis(SymbolTable * symTab){
 		}
 		for (auto stmt : *myBody) {
 			nameAnalysisOk = stmt->nameAnalysis(symTab);
+			if (!nameAnalysisOk)
+			{
+				symTab->remove();
+				return false;
+			}
+		}
+		symTab->remove();
+		return true;
+	}
+	return nameAnalysisOk;
+}
+
+bool ClassDefnNode::nameAnalysis(SymbolTable * symTab){
+	bool nameAnalysisOk = true;
+
+	SemSymbol * classDeclSymbol = new SemSymbol(myID->getName(), std::string("clss"), myID->getName());
+	myID->attachSymbol(classDeclSymbol);
+	nameAnalysisOk = symTab->insertSymbolIntoCurrentScope(classDeclSymbol);
+	if (nameAnalysisOk)
+	{
+		ScopeTable * classScope = new ScopeTable();
+		symTab->insert(classScope);
+		for (auto member : *myMembers) {
+			nameAnalysisOk = member->nameAnalysis(symTab);
+			if (!nameAnalysisOk)
+			{
+				return false;
+			}
+		}
+		for (auto member : *myMembers) {
+			nameAnalysisOk = member->nameAnalysis(symTab);
 			if (!nameAnalysisOk)
 			{
 				symTab->remove();
