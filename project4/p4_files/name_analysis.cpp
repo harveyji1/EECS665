@@ -84,34 +84,47 @@ bool FnDeclNode::nameAnalysis(SymbolTable * symTab){
 }
 
 bool ClassDefnNode::nameAnalysis(SymbolTable * symTab){
-	bool nameAnalysisOk = true;
+	 bool nameAnalysisOk = true;
+    // Get the class name
+    std::string className = myID->getName();
 
-	SemSymbol * classDeclSymbol = new SemSymbol(myID->getName(), std::string("clss"), myID->getName());
-	myID->attachSymbol(classDeclSymbol);
-	nameAnalysisOk = symTab->insertSymbolIntoCurrentScope(classDeclSymbol);
-	if (nameAnalysisOk)
-	{
-		ScopeTable * classScope = new ScopeTable();
-		symTab->insert(classScope);
-		for (auto member : *myMembers) {
-			nameAnalysisOk = member->nameAnalysis(symTab);
-			if (!nameAnalysisOk)
-			{
-				return false;
-			}
-		}
-		for (auto member : *myMembers) {
-			nameAnalysisOk = member->nameAnalysis(symTab);
-			if (!nameAnalysisOk)
-			{
-				symTab->remove();
-				return false;
-			}
-		}
-		symTab->remove();
-		return true;
-	}
-	return nameAnalysisOk;
+    // Check if the class name is already defined in the current scope
+    if (symTab->searchscopes(className) != nullptr) {
+        // Class name is already defined in the current scope
+        std::cerr << "Error " << myPos->begin() << ": Multiply declared identifier\n";
+        return false;
+    }
+
+    // Create a new class entry in the symbol table
+    SemSymbol* classSymbol = new SemSymbol(className, "class", className);
+    myID->attachSymbol(classSymbol);
+
+    // Insert the class symbol into the current scope
+    nameAnalysisOk = symTab->insertSymbolIntoCurrentScope(classSymbol);
+
+    if (nameAnalysisOk) {
+        // Enter a new scope for the class
+        ScopeTable* classScope = new ScopeTable();
+        symTab->insert(classScope);
+
+        // Iterate through the members of the class and perform name analysis on them
+        for (DeclNode* member : *myMembers) {
+            if (!member->nameAnalysis(symTab)) {
+                // Member name analysis failed, report error and set nameAnalysisOk to false
+                // Handle the error as per your language's requirements
+                // Example:
+                std::cerr << "Error: Name analysis for a member of class '" << className << "' failed." << std::endl;
+                nameAnalysisOk = false;
+                break;
+            }
+        }
+
+        // Exit the scope for the class
+        symTab->remove();
+    }
+
+    // Name analysis for the class definition is successful if nameAnalysisOk is still true
+    return nameAnalysisOk;
 }
 
 bool IntTypeNode::nameAnalysis(SymbolTable* symTab){

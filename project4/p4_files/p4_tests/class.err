@@ -1,2 +1,1 @@
-FATAL [2,5]: Multiply declared identifier
-Name Analysis Failed
+ToDoError: This function should havebeen overriden in the subclass!
