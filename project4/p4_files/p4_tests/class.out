@@ -1,3 +1,4 @@
+num{int} : int;
 student{student} : class {
     studentID{int} : int;
 };
@@ -5,6 +6,7 @@ lame{lame} : class {
     lameness{int} : int;
 };
 main{() -> void} : () void  {
-    harvey{myID->getSymbol()->getType()} : student{student};
-    loser{myID->getSymbol()->getType()} : lame{lame};
+    num{int} = 1;
+    harvey{student} : student{student};
+    loser{lame} : lame{lame};
 }

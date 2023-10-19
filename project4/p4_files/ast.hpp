@@ -275,7 +275,7 @@ public:
 	IDNode * inField)
 	: LocNode(p), myBase(inBase), myField(inField) { }
 	void unparse(std::ostream& out, int indent) override;
-	bool nameAnalysis(SymbolTable *) override;
+	bool nameAnalysis(SymbolTable * symTab) override;
 private:
 	LocNode * myBase;
 	IDNode * myField;
@@ -414,7 +414,7 @@ public:
 	ClassTypeNode(const Position * p, IDNode * inID)
 	: TypeNode(p), myID(inID){}
 	void unparse(std::ostream& out, int indent) override;
-	std::string getType() override { return myID->getSymbol()->getType(); }
+	std::string getType() { return myID->getName(); };
 	bool nameAnalysis(SymbolTable *) override;
 private:
 	IDNode * myID;

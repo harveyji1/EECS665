@@ -207,7 +207,7 @@ bool IDNode::nameAnalysis(SymbolTable* symTab) {
 }
 
 bool AssignStmtNode::nameAnalysis(SymbolTable* symTab) {
-	return mySrc->nameAnalysis(symTab);
+	return myDst->nameAnalysis(symTab);
 }
 
 bool UnaryExpNode::nameAnalysis(SymbolTable* symTab) {
