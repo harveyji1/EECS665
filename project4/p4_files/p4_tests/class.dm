@@ -9,6 +9,7 @@ lame: class{
 };
 
 main: () void {
+    fakevariable = 2;
     num = 1;
     harvey:student;
     loser: lame;

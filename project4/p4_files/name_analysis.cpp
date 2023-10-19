@@ -1,6 +1,7 @@
 #include "ast.hpp"
 #include "symbol_table.hpp"
 #include "errors.hpp"
+#include "errName.hpp"
 
 namespace drewno_mars{
 
@@ -201,7 +202,9 @@ bool IDNode::nameAnalysis(SymbolTable* symTab) {
 		return true;
 	}
 	else {
-		std::cerr << "FATAL " << myPos->begin() << ": Undeclared identifier\n";
+		//std::cerr << "FATAL " << myPos->begin() << ": Undeclared identifier\n";
+		NameErr * error = new NameErr;
+		error->undeclID(myPos);
 		return false;
 	}
 }
