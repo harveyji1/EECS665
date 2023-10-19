@@ -6,6 +6,7 @@
 #include <string.h>
 #include <list>
 #include "tokens.hpp"
+#include "symbol_table.hpp"
 
 namespace drewno_mars {
 
@@ -96,7 +97,7 @@ public:
 class ClassDefnNode : public DeclNode{
 public:
 	ClassDefnNode(const Position * p, IDNode * inID, std::list<DeclNode *> * inMembers)
-	: DeclNode(p), myID(inID), myMembers(inMembers){ }
+	: DeclNode(p), myID(inID), myMembers(inMembers){}
 	void unparse(std::ostream& out, int indent) override;
 	IDNode * ID(){ return myID; }
 	bool nameAnalysis(SymbolTable * symTab) override;
@@ -274,6 +275,7 @@ public:
 	IDNode * inField)
 	: LocNode(p), myBase(inBase), myField(inField) { }
 	void unparse(std::ostream& out, int indent) override;
+	bool nameAnalysis(SymbolTable *) override;
 private:
 	LocNode * myBase;
 	IDNode * myField;
@@ -413,6 +415,7 @@ public:
 	: TypeNode(p), myID(inID){}
 	void unparse(std::ostream& out, int indent) override;
 	std::string getType() override { return "class"; }
+	bool nameAnalysis(SymbolTable *) override;
 private:
 	IDNode * myID;
 };

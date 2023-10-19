@@ -11,6 +11,8 @@ using HashMap = std::unordered_map<K, V>;
 
 using namespace std;
 
+class ScopeTable;
+
 namespace drewno_mars{
 
 //A semantic symbol, which represents a single
@@ -23,17 +25,22 @@ class SemSymbol {
 	// (i.e. the kind of the symbol (either a variable or function)
 	// and functions to get/set those fields
 	public:
-		SemSymbol(std::string name, std::string kind, std::string type): Name(name), Kind(kind), Type(type) {}
+		SemSymbol(std::string name, std::string kind, std::string type, ScopeTable* scope = nullptr): Name(name), Kind(kind), Type(type), AssociatedScope(scope){}
 		void setName(std::string name) { Name = name; }
 		void setKind(std::string kind) { Kind = kind; }
 		void setType(std::string type) { Type = type; }
+		void setAssociatedScope(ScopeTable* scope) { AssociatedScope = scope; }
+
 		std::string getName() { return Name; }
 		std::string getKind() { return Kind; }
 		std::string getType() { return Type; }
+		ScopeTable* getAssociatedScope() { return AssociatedScope; }
+
 	private:
 		std::string Name;
 		std::string Kind;
 		std::string Type;
+		ScopeTable* AssociatedScope;
 };
 
 //A single scope. The symbol table is broken down into a 
@@ -54,13 +61,41 @@ class ScopeTable {
 			return symbols->insert(item).second;
 		}
 		SemSymbol * lookup(std::string id) {
+    		
+			for (const auto& pair : *symbols) {
+        		const std::string& symbolId = pair.first;
+       			SemSymbol* symbol = pair.second;
+
+        		// Perform specific checks on the symbol
+       	 		if (symbolId == id) {
+            		return symbol; // If you want to return it immediately
+        		}
+
+        		if (symbol->getAssociatedScope() != nullptr) {
+            		//SemSymbol* classDeclared = symbol->getAssociatedScope()->lookup(id);
+					
+					//return classDeclared;
+        		}
+
+        	// Continue checking other attributes of the symbol as needed
+    		}
+
+    	// If you want to return null when the symbol is not found
+    		return nullptr;
+
+		}
+
+		/*OLD CODE
+		 {
 			std::unordered_map<std::string, SemSymbol *>::const_iterator item = symbols->find(id);
 			if (item == symbols->end()) {
 				return nullptr;
 			} else {
 				return item->second;
 			}
-		}
+		} 
+		*/
+		
 	private:
 		HashMap<std::string, SemSymbol *> * symbols;
 };

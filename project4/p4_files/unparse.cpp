@@ -322,7 +322,7 @@ void BoolTypeNode::unparse(std::ostream& out, int indent){
 void IDNode::unparse(std::ostream& out, int indent){
 	doIndent(out, indent);
 	out << name;
-	out << "{" << mySymbol->getType() << "}"; //not sure why this isn't printing it
+	out << "{" << mySymbol->getType() << "}";
 
 }
 

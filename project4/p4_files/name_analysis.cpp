@@ -40,6 +40,17 @@ bool VarDeclNode::nameAnalysis(SymbolTable * symTab){
 		std::cerr << "FATAL " << myPos->begin() << ": Multiply declared identifier\n";
 		return false;
 	}
+
+	//not quite printing the right thing
+
+	TypeNode* typeNode = this->getTypeNode();
+	ClassTypeNode* classType = dynamic_cast<ClassTypeNode*>(typeNode);
+	if(classType){
+			if(!classType->nameAnalysis(symTab)){
+				nameAnalysisOk = false;
+			}
+	}
+
 	return nameAnalysisOk;
 }
 
@@ -83,48 +94,62 @@ bool FnDeclNode::nameAnalysis(SymbolTable * symTab){
 	return nameAnalysisOk;
 }
 
-bool ClassDefnNode::nameAnalysis(SymbolTable * symTab){
-	 bool nameAnalysisOk = true;
-    // Get the class name
-    std::string className = myID->getName();
+bool ClassDefnNode::nameAnalysis(SymbolTable * symTab){ 
 
-    // Check if the class name is already defined in the current scope
-    if (symTab->searchscopes(className) != nullptr) {
-        // Class name is already defined in the current scope
-        std::cerr << "Error " << myPos->begin() << ": Multiply declared identifier\n";
-        return false;
-    }
+	bool nameAnalysisOk = true;
+	std::string classType(myID->getName());
+	SemSymbol * classDeclSymbol = new SemSymbol(myID->getName(), std::string("class"), classType);
+	nameAnalysisOk = symTab->insertSymbolIntoCurrentScope(classDeclSymbol);
+	myID->attachSymbol(classDeclSymbol);
+	ScopeTable* classScope = new ScopeTable();
+	symTab->insert(classScope);
+	//classDeclSymbol->setAssociatedScope(classScope); this line is causing the issue!
 
-    // Create a new class entry in the symbol table
-    SemSymbol* classSymbol = new SemSymbol(className, "class", className);
-    myID->attachSymbol(classSymbol);
+	if (nameAnalysisOk)
+	{
+		for (auto members : *myMembers) {
+			nameAnalysisOk = members->nameAnalysis(symTab);
+			if (!nameAnalysisOk)
+			{
+				symTab->remove();
+				return false;
+			}
+		}
+		symTab->remove();
+	}
+	return nameAnalysisOk;
+	
+}
 
-    // Insert the class symbol into the current scope
-    nameAnalysisOk = symTab->insertSymbolIntoCurrentScope(classSymbol);
+bool ClassTypeNode::nameAnalysis(SymbolTable* symTab){
+	std::string className = myID->getName();
 
-    if (nameAnalysisOk) {
-        // Enter a new scope for the class
-        ScopeTable* classScope = new ScopeTable();
-        symTab->insert(classScope);
+	SemSymbol* classSymbol = symTab->searchscopes(className);
+	if(!classSymbol || classSymbol->getKind() != "class"){
+		std::cerr << "FATAL " << myPos->begin() << ": Multiply declared identifier\n";
+		return false;
+	}
 
-        // Iterate through the members of the class and perform name analysis on them
-        for (DeclNode* member : *myMembers) {
-            if (!member->nameAnalysis(symTab)) {
-                // Member name analysis failed, report error and set nameAnalysisOk to false
-                // Handle the error as per your language's requirements
-                // Example:
-                std::cerr << "Error: Name analysis for a member of class '" << className << "' failed." << std::endl;
-                nameAnalysisOk = false;
-                break;
-            }
-        }
+	myID->attachSymbol(classSymbol);
 
-        // Exit the scope for the class
-        symTab->remove();
-    }
+	return true;
 
-    // Name analysis for the class definition is successful if nameAnalysisOk is still true
-    return nameAnalysisOk;
+}
+
+bool MemberFieldExpNode::nameAnalysis(SymbolTable* symTab){
+	bool nameAnalysisOk = true;
+
+	if(!(myBase->nameAnalysis(symTab))){
+		std::cerr << "FATAL " << myPos->begin() << ": Undeclared identifier";
+		nameAnalysisOk=false;
+	}
+
+	if(!(myField->nameAnalysis(symTab))){
+		nameAnalysisOk=false;
+		std::cerr << "FATAL " << myPos->begin() << ": member variable";
+	}
+
+	return nameAnalysisOk;
 }
 
 bool IntTypeNode::nameAnalysis(SymbolTable* symTab){

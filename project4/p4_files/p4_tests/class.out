@@ -1,0 +1,10 @@
+student{student} : class {
+    studentID{int} : int;
+};
+lame{lame} : class {
+    lameness{int} : int;
+};
+main{() -> void} : () void  {
+    harvey{class} : student{student};
+    loser{class} : lame{lame};
+}

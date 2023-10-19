@@ -2,7 +2,11 @@ student: class{
     studentID: int;
 };
 
+lame: class{
+    lameness: int;
+};
+
 main: () void {
-    harvey: student;
-    harvey--studentID=1;
+    harvey:student;
+    loser: lame;
 }
