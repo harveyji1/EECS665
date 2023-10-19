@@ -72,9 +72,11 @@ class ScopeTable {
             		return symbol; // If you want to return it immediately
         		}
 
-        		if (symbol->getAssociatedScope() != nullptr) {
+        		if (symbol->getAssociatedScope()) {
             		//SemSymbol* classDeclared = symbol->getAssociatedScope()->lookup(id);
-					
+					if(symbol->getAssociatedScope()->lookup(id) != nullptr){
+						return symbol->getAssociatedScope()->lookup(id);
+					}
 					//return classDeclared;
         		}
 

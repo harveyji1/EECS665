@@ -5,8 +5,9 @@ student{student} : class {
 lame{lame} : class {
     lameness{int} : int;
 };
-main{() -> void} : () void  {
+main{()->void} : () void  {
     num{int} = 1;
     harvey{student} : student{student};
     loser{lame} : lame{lame};
+    harvey{student}--studentID{int} = 1;
 }
