@@ -103,7 +103,7 @@ bool ClassDefnNode::nameAnalysis(SymbolTable * symTab){
 	myID->attachSymbol(classDeclSymbol);
 	ScopeTable* classScope = new ScopeTable();
 	symTab->insert(classScope);
-	//classDeclSymbol->setAssociatedScope(classScope); this line is causing the issue!
+	
 
 	if (nameAnalysisOk)
 	{
@@ -115,6 +115,7 @@ bool ClassDefnNode::nameAnalysis(SymbolTable * symTab){
 				return false;
 			}
 		}
+		classDeclSymbol->setAssociatedScope(classScope); //this line is causing the issue!
 		symTab->remove();
 	}
 	return nameAnalysisOk;

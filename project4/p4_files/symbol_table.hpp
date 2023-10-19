@@ -11,9 +11,10 @@ using HashMap = std::unordered_map<K, V>;
 
 using namespace std;
 
-class ScopeTable;
 
 namespace drewno_mars{
+
+class ScopeTable;
 
 //A semantic symbol, which represents a single
 // variable, function, etc. Semantic symbols 

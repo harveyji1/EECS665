@@ -414,7 +414,7 @@ public:
 	ClassTypeNode(const Position * p, IDNode * inID)
 	: TypeNode(p), myID(inID){}
 	void unparse(std::ostream& out, int indent) override;
-	std::string getType() override { return "class"; }
+	std::string getType() override { return myID->getSymbol()->getType(); }
 	bool nameAnalysis(SymbolTable *) override;
 private:
 	IDNode * myID;

@@ -5,6 +5,6 @@ lame{lame} : class {
     lameness{int} : int;
 };
 main{() -> void} : () void  {
-    harvey{class} : student{student};
-    loser{class} : lame{lame};
+    harvey{myID->getSymbol()->getType()} : student{student};
+    loser{myID->getSymbol()->getType()} : lame{lame};
 }
