@@ -1,0 +1,10 @@
+MyClass{MyClass} : class {
+    x{int} : int;
+    myFunction{(int)->int} : (param{int} : int) int  {
+        give x{int} + param{int};
+    }
+};
+main{()->void} : () void  {
+    obj{MyClass} : MyClass{MyClass};
+    result{int} : int = obj{MyClass}--myFunction{(int)->int}(5);
+}

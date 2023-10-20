@@ -1,0 +1,7 @@
+Person{Person} : class {
+    name{int} : int;
+    age{int} : int;
+};
+g{()->int} : () int {
+    a{Person} : Person{Person};
+}

@@ -1,0 +1,6 @@
+main{()->void} : () void {
+    counter{int} : int = 0;
+    while (counter{int} < 5){
+        counter{int} = counter{int} + 1;
+    }
+}

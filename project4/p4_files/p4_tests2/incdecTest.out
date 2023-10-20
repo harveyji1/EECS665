@@ -1,0 +1,6 @@
+v{()->int} : () int {
+    a{int} : int = 5;
+    a{int}++;
+    a{int}--;
+    return -1 + 2 * 3;
+}

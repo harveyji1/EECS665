@@ -1,0 +1,2 @@
+a{perfect int} : perfect int;
+flag{bool} : bool;

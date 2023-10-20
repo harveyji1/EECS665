@@ -1,0 +1,7 @@
+funct{()->void} : () void {
+    x{perfect int} : perfect int;
+    y{int} : int;
+    give x{perfect int};
+    take y{int};
+    isCold{bool} : bool = false;
+}

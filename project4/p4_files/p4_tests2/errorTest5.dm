@@ -1,0 +1,1 @@
+fnC : (p : void) int {}

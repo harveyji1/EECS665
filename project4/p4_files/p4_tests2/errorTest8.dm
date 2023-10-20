@@ -1,0 +1,2 @@
+fnE : () int {}
+fnE : int;

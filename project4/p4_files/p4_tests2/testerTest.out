@@ -1,0 +1,3 @@
+x{int} : int;
+y{int} : int = x{int} - 5;
+z{bool} : bool = y{int} > 3 and y{int} < 10;
