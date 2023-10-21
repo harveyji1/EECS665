@@ -1,4 +1,4 @@
-v{()->int} : () int {
+v{()->int} : () int  {
     today I don't feel like doing any work;
     a{int} : int;
     b{int} : int = -a{int};

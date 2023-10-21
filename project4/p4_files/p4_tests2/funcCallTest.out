@@ -1,4 +1,4 @@
-fn{(int, int)->int} : (a{int} : int, b{int} : int) int {
+fn{(int,int)->int} : (a{int} : int, b{int} : int) int  {
     if (a{int}){
         x{int} : int = 5;
     } else {

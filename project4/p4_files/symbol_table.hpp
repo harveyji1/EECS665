@@ -73,7 +73,7 @@ class ScopeTable {
         		}
 
         		if (symbol->getAssociatedScope()) {
-            		//SemSymbol* classDeclared = symbol->getAssociatedScope()->lookup(id);
+            		
 					if(symbol->getAssociatedScope()->lookup(id) != nullptr){
 						return symbol->getAssociatedScope()->lookup(id);
 					}
@@ -131,6 +131,9 @@ class SymbolTable{
 				}
 			}
 			return nullptr;
+		}
+		bool existsInCurrentScope(const std::string &name) const {
+			return scopeTableChain->back()->lookup(name) != nullptr;
 		}
 	private:
 		std::list<ScopeTable *> * scopeTableChain;

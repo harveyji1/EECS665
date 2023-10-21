@@ -1,5 +1,1 @@
 glob{bool} : bool;
-main{()->int} : (){
-	a{int} : int;
-	glob{bool} = a{int};
-}

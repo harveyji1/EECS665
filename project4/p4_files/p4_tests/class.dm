@@ -9,9 +9,9 @@ lame: class{
 };
 
 main: () void {
-    fakevariable = 2;
+    fakevariable = 1;
     num = 1;
-    harvey:student;
+    harvey: student;
     loser: lame;
     harvey--studentID = 1;
 }

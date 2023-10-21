@@ -174,9 +174,7 @@ void CallStmtNode::unparse(std::ostream& out, int indent){
 }
 
 void ExpNode::unparseNested(std::ostream& out){
-	out << "(";
 	unparse(out, 0);
-	out << ")";
 }
 
 void CallExpNode::unparse(std::ostream& out, int indent){

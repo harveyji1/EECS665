@@ -1,5 +1,5 @@
 calc{calc} : class {
-    fn{(int, int)->int} : (a{int} : int, b{int} : int) int {
+    fn{(int,int)->int} : (a{int} : int, b{int} : int) int  {
         take a{int};
     }
 };

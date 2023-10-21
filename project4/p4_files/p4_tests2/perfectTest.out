@@ -1,2 +1,2 @@
-a{perfect int} : perfect int;
+a{perfectint} : perfect int;
 flag{bool} : bool;

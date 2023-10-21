@@ -1,1 +1,1 @@
-glob{} : bool;
+glob{bool} : bool;

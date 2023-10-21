@@ -1,4 +1,4 @@
-v{()->int} : () int {
+v{()->int} : () int  {
     a{int} : int = 5;
     a{int}++;
     a{int}--;

@@ -27,6 +27,32 @@ bool ProgramNode::nameAnalysis(SymbolTable * symTab){
 
 bool VarDeclNode::nameAnalysis(SymbolTable * symTab){
 	bool nameAnalysisOk = true;
+    string varName = myID->getName();
+    if(symTab->existsInCurrentScope(varName)){
+		string varType = this->getTypeNode()->getType();
+		if (varType == "void") {
+			NameErr::badVarType(myID->pos());
+		} 
+		NameErr::multiDecl(myID->pos());
+        nameAnalysisOk = false;
+		return nameAnalysisOk;
+    } else {
+        string varType = this->getTypeNode()->getType();
+		if (varType == "void") {
+			NameErr::badVarType(myID->pos());
+			nameAnalysisOk = false;
+			return nameAnalysisOk;
+		} 
+        string varKind = "var";
+        SemSymbol * newVarSymbol = new SemSymbol(varName, varKind, varType);
+        symTab->insertSymbolIntoCurrentScope(newVarSymbol);
+        myID->attachSymbol(newVarSymbol);
+		if(myInit){
+			nameAnalysisOk = nameAnalysisOk && myInit->nameAnalysis(symTab);
+		}
+		
+    }
+	/*bool nameAnalysisOk = true;
 	if (myType->getType().compare("void") == 0)
 	{
 		std::cerr << "FATAL " << myPos->begin() << ": Invalid type in declaration\n";
@@ -40,9 +66,7 @@ bool VarDeclNode::nameAnalysis(SymbolTable * symTab){
 	{
 		std::cerr << "FATAL " << myPos->begin() << ": Multiply declared identifier\n";
 		return false;
-	}
-
-	//not quite printing the right thing
+	}*/
 
 	TypeNode* typeNode = this->getTypeNode();
 	ClassTypeNode* classType = dynamic_cast<ClassTypeNode*>(typeNode);
@@ -57,6 +81,76 @@ bool VarDeclNode::nameAnalysis(SymbolTable * symTab){
 
 bool FnDeclNode::nameAnalysis(SymbolTable * symTab){
 	bool nameAnalysisOk = true;
+
+    string funcName = myID->getName();
+
+    TypeNode* retTypeNode = this->myRetType;
+	if(symTab->searchscopes(retTypeNode->getType())){
+		retTypeNode->nameAnalysis(symTab);
+	}
+
+	ClassTypeNode* classReturnType = dynamic_cast<ClassTypeNode*>(retTypeNode);
+	if (classReturnType && !symTab->searchscopes(classReturnType->getType())) {
+		NameErr::badVarType(classReturnType->pos());  
+		nameAnalysisOk = false;
+	}
+
+    if (symTab->existsInCurrentScope(funcName)) {
+        NameErr::multiDecl(myID->pos());
+        nameAnalysisOk = false;
+    }
+
+    string returnType = "(";
+    bool firstFormal = true;
+    for(auto formal : *myFormals ){
+        if(firstFormal){
+            returnType += formal->getTypeNode()->getType();
+            firstFormal = false;
+        }else{
+            returnType += "," + formal->getTypeNode()->getType();
+        }
+    }
+    returnType += ")->" + myRetType->getType();
+
+	
+    
+    string funcKind = "fn";
+    SemSymbol * newFuncSymbol = new SemSymbol(funcName, funcKind, returnType);
+    symTab->insertSymbolIntoCurrentScope(newFuncSymbol);
+    myID->attachSymbol(newFuncSymbol);
+	ScopeTable* newFnScope = new ScopeTable();
+    symTab->insert(newFnScope);
+
+    for (FormalDeclNode * formal : *myFormals) {
+        string paramName = formal->ID()->getName();
+        string paramType = formal->getTypeNode()->getType();
+
+        if (paramType == "void") { 
+            NameErr::badVarType(formal->ID()->pos());
+            nameAnalysisOk = false;
+        }
+
+        if (symTab->existsInCurrentScope(paramName)) {
+            NameErr::multiDecl(formal->ID()->pos());
+            nameAnalysisOk = false;
+        } else {
+            string paramKind = "var";  
+            SemSymbol * paramSymbol = new SemSymbol(paramName, paramKind, paramType);
+            symTab->insertSymbolIntoCurrentScope(paramSymbol);
+            formal->ID()->attachSymbol(paramSymbol);
+        }
+    }
+
+    for (StmtNode * stmt : *myBody) {
+        if(!stmt->nameAnalysis(symTab)) {
+            nameAnalysisOk = false;
+        }
+    }
+
+    symTab->remove();
+
+    return nameAnalysisOk;
+	/*bool nameAnalysisOk = true;
 	std::string fnType("");
 	std::string comma = "";
 	fnType.append("(");
@@ -92,7 +186,7 @@ bool FnDeclNode::nameAnalysis(SymbolTable * symTab){
 		symTab->remove();
 		return true;
 	}
-	return nameAnalysisOk;
+	return nameAnalysisOk;*/
 }
 
 bool ClassDefnNode::nameAnalysis(SymbolTable * symTab){ 
@@ -128,7 +222,7 @@ bool ClassTypeNode::nameAnalysis(SymbolTable* symTab){
 
 	SemSymbol* classSymbol = symTab->searchscopes(className);
 	if(!classSymbol || classSymbol->getKind() != "class"){
-		std::cerr << "FATAL " << myPos->begin() << ": Multiply declared identifier\n";
+		NameErr::badVarType(myID->pos());
 		return false;
 	}
 
@@ -142,13 +236,13 @@ bool MemberFieldExpNode::nameAnalysis(SymbolTable* symTab){
 	bool nameAnalysisOk = true;
 
 	if(!(myBase->nameAnalysis(symTab))){
-		std::cerr << "FATAL " << myPos->begin() << ": Undeclared identifier";
+		NameErr::undeclID(myBase->pos());
 		nameAnalysisOk=false;
 	}
 
 	if(!(myField->nameAnalysis(symTab))){
 		nameAnalysisOk=false;
-		std::cerr << "FATAL " << myPos->begin() << ": member variable";
+		 NameErr::undeclID(myField->pos());
 	}
 
 	return nameAnalysisOk;
@@ -171,19 +265,38 @@ bool VoidTypeNode::nameAnalysis(SymbolTable* symTab) {
 
 bool CallExpNode::nameAnalysis(SymbolTable* symTab) {
 	bool nameAnalysisOk = true;
-	nameAnalysisOk = myCallee->nameAnalysis(symTab);
-	if (nameAnalysisOk)
-	{
-		for (auto arg : *myArgs )
-		{
-			nameAnalysisOk = arg->nameAnalysis(symTab);
-			if (!nameAnalysisOk)
-			{
-				return false;
-			}
+
+    if (IDNode* idCallee = dynamic_cast<IDNode*>(myCallee)) {    
+        SemSymbol * fnSymbol = symTab->searchscopes(idCallee->getName());
+        if (fnSymbol) {
+            idCallee->attachSymbol(fnSymbol);
+        } else {
+
+            nameAnalysisOk = false;
+        }
+    }  else{
+			nameAnalysisOk = myCallee->nameAnalysis(symTab);
+    }
+
+    for (ExpNode * argExp : *myArgs) {
+        if (IDNode* idArg = dynamic_cast<IDNode*>(argExp)) {    
+            SemSymbol * argSymbol = symTab->searchscopes(idArg->getName());
+            if (argSymbol) {
+                idArg->attachSymbol(argSymbol);
+            } else {
+                nameAnalysisOk = false;
+            }
+        }else if (MemberFieldExpNode* memberFuncCall = dynamic_cast<MemberFieldExpNode*>(argExp)){
+			memberFuncCall->getBase()->nameAnalysis(symTab);
+			memberFuncCall->getField()->nameAnalysis(symTab);
+			
 		}
-	}
-	return nameAnalysisOk;
+		 else {
+            nameAnalysisOk &= argExp->nameAnalysis(symTab);
+        }
+    }
+
+    return nameAnalysisOk;
 }
 
 bool CallStmtNode::nameAnalysis(SymbolTable* symTab) {
@@ -202,15 +315,41 @@ bool IDNode::nameAnalysis(SymbolTable* symTab) {
 		return true;
 	}
 	else {
-		//std::cerr << "FATAL " << myPos->begin() << ": Undeclared identifier\n";
-		NameErr * error = new NameErr;
-		error->undeclID(myPos);
+		NameErr::undeclID(myPos);
 		return false;
 	}
 }
 
 bool AssignStmtNode::nameAnalysis(SymbolTable* symTab) {
-	return myDst->nameAnalysis(symTab);
+	 bool nameAnalysisOk = true;
+
+    if (IDNode* idDst = dynamic_cast<IDNode*>(myDst)) {
+        SemSymbol * dstSymbol = symTab->searchscopes(idDst->getName());
+        if(dstSymbol){
+            idDst->attachSymbol(dstSymbol);
+        } else {
+            nameAnalysisOk = false;
+        }
+    } else if (!myDst->nameAnalysis(symTab)) {
+        nameAnalysisOk = false;
+    }
+
+    if (IDNode* idSrc = dynamic_cast<IDNode*>(mySrc)) {
+        SemSymbol * srcSymbol = symTab->searchscopes(idSrc->getName());
+        if(srcSymbol){
+            idSrc->attachSymbol(srcSymbol);
+        } else {
+            nameAnalysisOk = false;
+        }
+    } else if (!mySrc->nameAnalysis(symTab)) {
+        nameAnalysisOk = false;
+    }
+
+    return nameAnalysisOk;
+}
+
+bool ExpNode::nameAnalysis(SymbolTable * symTab){
+	return true;
 }
 
 bool UnaryExpNode::nameAnalysis(SymbolTable* symTab) {
@@ -306,9 +445,63 @@ bool WhileStmtNode::nameAnalysis(SymbolTable* symTab) {
 }
 
 bool ReturnStmtNode::nameAnalysis(SymbolTable* symTab) {
-	return myExp->nameAnalysis(symTab);
+	if(myExp){
+        return myExp->nameAnalysis(symTab);
+    }
+    
+
+    return true;
+}
+
+bool MagicNode::nameAnalysis(SymbolTable * symTab) {
+    return true;
+}
+
+bool AndNode::nameAnalysis(SymbolTable * symTab){
+
+    bool leftOk = myExp1->nameAnalysis(symTab);
+    bool rightOk = myExp2->nameAnalysis(symTab);
+
+
+    
+    return leftOk && rightOk; 
+}
+
+bool OrNode::nameAnalysis(SymbolTable * symTab){
+
+    bool leftOk = myExp1->nameAnalysis(symTab);
+    bool rightOk = myExp2->nameAnalysis(symTab);
+
+    
+    return leftOk && rightOk; 
+}
+
+bool NotNode::nameAnalysis(SymbolTable * symTab){
+    
+    bool operandOk = myExp->nameAnalysis(symTab);
+    return operandOk; 
+}
+
+bool PostIncStmtNode::nameAnalysis(SymbolTable * symTab){
+    
+    return myLoc->nameAnalysis(symTab);
+}
+
+bool PostDecStmtNode::nameAnalysis(SymbolTable * symTab){
+    
+    return myLoc->nameAnalysis(symTab);
 }
 
 
+bool ExitStmtNode::nameAnalysis(SymbolTable * symTab){
+    
+    return true;
+}
+
+
+bool NegNode::nameAnalysis(SymbolTable * symTab){
+    
+    return myExp->nameAnalysis(symTab);
+}
 
 }

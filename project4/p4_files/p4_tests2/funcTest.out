@@ -1,6 +1,6 @@
-fun{()->int} : () int {
+fun{()->int} : () int  {
     give 5;
 }
-main{()->void} : () void {
+main{()->void} : () void  {
     fun{()->int}();
 }
