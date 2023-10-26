@@ -123,11 +123,59 @@ void VarDeclNode::typeAnalysis(TypeAnalysis * ta){
 	ta->nodeType(this, BasicType::produce(VOID));
 }
 
+void ClassDefnNode::typeAnalysis(TypeAnalysis * ta){
+	ta->nodeType(this, BasicType::produce(VOID));
+}
+
 void IDNode::typeAnalysis(TypeAnalysis * ta){
 	// IDs never fail type analysis and always
 	// yield the type of their symbol (which
 	// depends on their definition)
 	ta->nodeType(this, this->getSymbol()->getDataType());
+}
+
+void CallExpNode::typeAnalysis(TypeAnalysis * ta){
+	
+}
+
+void CallStmtNode::typeAnalysis(TypeAnalysis * ta){
+	
+}
+
+void ExitStmtNode::typeAnalysis(TypeAnalysis * ta){
+	ta->nodeType(this, BasicType::produce(CLASS));
+}
+
+void GiveStmtNode::typeAnalysis(TypeAnalysis * ta){
+	
+}
+
+void IfElseStmtNode::typeAnalysis(TypeAnalysis * ta){
+	
+}
+
+void IfStmtNode::typeAnalysis(TypeAnalysis * ta){
+	
+}
+
+void PostDecStmtNode::typeAnalysis(TypeAnalysis * ta){
+	
+}
+
+void PostIncStmtNode::typeAnalysis(TypeAnalysis * ta){
+	
+}
+
+void ReturnStmtNode::typeAnalysis(TypeAnalysis * ta){
+	
+}
+
+void TakeStmtNode::typeAnalysis(TypeAnalysis * ta){
+	
+}
+
+void WhileStmtNode::typeAnalysis(TypeAnalysis * ta){
+	
 }
 
 void IntLitNode::typeAnalysis(TypeAnalysis * ta){
@@ -150,6 +198,74 @@ void StrLitNode::typeAnalysis(TypeAnalysis * ta){
 
 void FalseNode::typeAnalysis(TypeAnalysis * ta){
 	ta->nodeType(this, BasicType::produce(STRING));
+}
+
+void MemberFieldExpNode::typeAnalysis(TypeAnalysis * ta){
+	ta->nodeType(this, this->myField->getSymbol()->getDataType());
+}
+
+void BinaryExpNode::typeAnalysis(TypeAnalysis * ta){
+	TODO("Override me in the subclass");
+}
+
+void AndNode::typeAnalysis(TypeAnalysis * ta){
+	
+}
+
+void DivideNode::typeAnalysis(TypeAnalysis * ta){
+	
+}
+
+void EqualsNode::typeAnalysis(TypeAnalysis * ta){
+	
+}
+
+void GreaterEqNode::typeAnalysis(TypeAnalysis * ta){
+	
+}
+
+void GreaterNode::typeAnalysis(TypeAnalysis * ta){
+	
+}
+
+void LessEqNode::typeAnalysis(TypeAnalysis * ta){
+	
+}
+
+void LessNode::typeAnalysis(TypeAnalysis * ta){
+	
+}
+
+void MinusNode::typeAnalysis(TypeAnalysis * ta){
+	
+}
+
+void NotEqualsNode::typeAnalysis(TypeAnalysis * ta){
+	
+}
+
+void OrNode::typeAnalysis(TypeAnalysis * ta){
+	
+}
+
+void PlusNode::typeAnalysis(TypeAnalysis * ta){
+	
+}
+
+void TimesNode::typeAnalysis(TypeAnalysis * ta){
+	
+}
+
+void UnaryExpNode::typeAnalysis(TypeAnalysis * ta){
+	TODO("Override me in the subclass");
+}
+
+void NegNode::typeAnalysis(TypeAnalysis * ta){
+	TODO("Override me in the subclass");
+}
+
+void NotNode::typeAnalysis(TypeAnalysis * ta){
+	TODO("Override me in the subclass");
 }
 
 }

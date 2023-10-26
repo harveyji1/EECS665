@@ -1,0 +1,2 @@
+FATAL [3,8]-[3,13]: Non-bool expression used as a condition
+Type Analysis Failed

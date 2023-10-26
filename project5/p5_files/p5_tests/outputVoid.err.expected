@@ -1,0 +1,2 @@
+FATAL [6,10]-[6,13]: Attempt to output void
+Type Analysis Failed

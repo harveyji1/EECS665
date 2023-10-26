@@ -1,0 +1,2 @@
+FATAL [3,8]-[3,13]: Relational operator applied to non-numeric operand
+Type Analysis Failed
