@@ -1,0 +1,6 @@
+FATAL [12,9]-[12,10]: Invalid assignment operand
+FATAL [14,9]-[14,11]: Invalid assignment operand
+FATAL [15,5]-[15,6]: Invalid assignment operand
+FATAL [16,10]-[16,13]: Function call with wrong number of args
+FATAL [16,5]-[16,7]: Invalid assignment operand
+Type Analysis Failed

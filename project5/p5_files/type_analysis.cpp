@@ -85,7 +85,26 @@ void AssignStmtNode::typeAnalysis(TypeAnalysis * ta){
 		ta->nodeType(this, ErrorType::produce());
 	}
 
+	if(tgtType->asFn()){
+		ta->errAssignOpd(myDst->pos());
+		if(srcType->asFn()){
+			ta->errAssignOpd(mySrc->pos());
+		}
+		ta->nodeType(this, ErrorType::produce());
+		return;
+	}
 
+	if (tgtType->asFn() || (srcType->asFn() && !mySrc->isFnCall()))
+	{
+		ta->errAssignOpd(mySrc->pos());
+		ta->nodeType(this, ErrorType::produce());
+		return;
+	}
+
+	if (mySrc->isFnCall() && tgtType == srcType->asFn()->getReturnType()) {
+		ta->nodeType(this, tgtType);
+		return;
+	}
 	//While incomplete, this gives you one case for 
 	// assignment: if the types are exactly the same
 	// it is usually ok to do the assignment. One
@@ -121,7 +140,7 @@ void DeclNode::typeAnalysis(TypeAnalysis * ta){
 }
 
 void VarDeclNode::typeAnalysis(TypeAnalysis * ta){
-	if(myInit != nullptr){
+	/*if(myInit != nullptr){
 		myInit->typeAnalysis(ta);
 		const DataType * myInitType = ta->nodeType(myInit);
 		//some placeholder, not sure how else to compare VarDecl type
@@ -143,7 +162,9 @@ void VarDeclNode::typeAnalysis(TypeAnalysis * ta){
 	}
 	else{
 	ta->nodeType(this, BasicType::produce(VOID));
-	}
+	}*/
+
+	ta->nodeType(this, BasicType::produce(VOID));
 }
 
 void ClassDefnNode::typeAnalysis(TypeAnalysis * ta){
@@ -223,7 +244,23 @@ void IfElseStmtNode::typeAnalysis(TypeAnalysis * ta){
 }
 
 void IfStmtNode::typeAnalysis(TypeAnalysis * ta){
-	
+	//CAUSING SEG FAULT
+	// myCond->typeAnalysis(ta);
+
+	// const DataType * CondType = ta->nodeType(myCond);
+
+	// // if (CondType->isBool() || CondType->asFn()->getReturnType()->isBool())
+	// // {
+	// // 	for (auto stmt : *myBody)
+	// // 	{
+	// // 		stmt->typeAnalysis(ta);
+	// // 	}
+	// // 	ta->nodeType(this, BasicType::produce(VOID));
+	// // 	return;
+	// // }
+
+	// ta->errCond(myCond->pos());
+	// ta->nodeType(this, ErrorType::produce());
 }
 
 void PostDecStmtNode::typeAnalysis(TypeAnalysis * ta){

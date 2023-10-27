@@ -55,6 +55,7 @@ public:
 	virtual void unparseNested(std::ostream& out);
 	virtual bool nameAnalysis(SymbolTable * symTab) override = 0;
 	virtual void typeAnalysis(TypeAnalysis *);
+	bool isFnCall(){ return false;}
 };
 
 class LocNode : public ExpNode{
@@ -309,6 +310,7 @@ public:
 	void unparseNested(std::ostream& out) override;
 	bool nameAnalysis(SymbolTable * symTab) override;
 	virtual void typeAnalysis(TypeAnalysis *) override;
+	bool isFnCall(){ return true;}
 private:
 	LocNode * myCallee;
 	std::list<ExpNode *> * myArgs;
