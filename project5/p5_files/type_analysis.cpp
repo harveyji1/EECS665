@@ -171,30 +171,30 @@ void CallExpNode::typeAnalysis(TypeAnalysis * ta){
 		if (formalTypes->count() != myArgs->size())
 		{
 			ta->errArgCount(this->pos());
-			error = true;
+			ta->nodeType(this, ErrorType::produce());
 		}
-		
-		ExpNode ** argArr = new ExpNode*[myArgs->size()];
-		int arrPos = 0;
-		for (auto arg : *myArgs) {
-			argArr[arrPos] = arg;
-			++arrPos;
-		}
-		
-		arrPos = 0;
-	// 	const std::list<const DataType *> * types = formalTypes->getTypes(); 
-	// 	for (auto type : *types)
-	// 	{
-	// 		argArr[arrPos]->typeAnalysis(ta);
-	// 		auto argType = ta->nodeType(argArr[arrPos]);
-	// 		if (type != argType)
-	// 		{
-	// 			ta->errArgMatch(myCallee->pos());
-	// 			error = true;
-	// 		}
-	// 		++arrPos;
+		else{
+			ExpNode ** argArr = new ExpNode*[myArgs->size()];
+			int arrPos = 0;
+			for (auto arg : *myArgs) {
+				argArr[arrPos] = arg;
+				++arrPos;
+			}
 			
-	// 	}
+			arrPos = 0;
+			const std::list<const DataType *> * types = formalTypes->getTypes(); 
+			for (auto type : *types)
+			{
+				argArr[arrPos]->typeAnalysis(ta);
+				auto argType = ta->nodeType(argArr[arrPos]);
+				if (type != argType)
+				{
+					ta->errArgMatch(argArr[arrPos]->pos());
+					error = true;
+				}
+				++arrPos;
+			}
+		}
 	}
 	if (error)
 	{
