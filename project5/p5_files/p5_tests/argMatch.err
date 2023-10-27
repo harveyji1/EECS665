@@ -1,0 +1,4 @@
+FATAL [10,8]-[10,12]: Type of actual does not match type of formal
+FATAL [10,14]-[10,19]: Type of actual does not match type of formal
+FATAL [11,9]-[11,10]: Type of actual does not match type of formal
+Type Analysis Failed
