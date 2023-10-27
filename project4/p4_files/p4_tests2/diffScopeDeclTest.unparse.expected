@@ -1,4 +1,0 @@
-b{int} : int;
-v{()->int} : () int  {
-    b{int} : int;
-}

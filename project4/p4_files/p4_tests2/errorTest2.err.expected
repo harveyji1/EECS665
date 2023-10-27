@@ -1,5 +1,0 @@
-FATAL [2,16]-[2,17]: Multiply declared identifier
-FATAL [4,5]-[4,6]: Invalid type in declaration
-FATAL [4,5]-[4,6]: Multiply declared identifier
-FATAL [7,1]-[7,2]: Multiply declared identifier
-Name Analysis Failed

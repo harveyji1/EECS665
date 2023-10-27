@@ -1,7 +1,0 @@
-MyClass{MyClass} : class {
-    x{int} : int;
-    y{bool} : bool;
-    myFunction{(int)->bool} : (param{int} : int) bool  {
-        give y{bool};
-    }
-};

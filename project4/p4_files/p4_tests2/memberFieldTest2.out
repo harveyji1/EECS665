@@ -1,8 +1,0 @@
-Person{Person} : class {
-    age{int} : int;
-};
-main{()->int} : () int  {
-    a{Person} : Person{Person};
-    b{int} : int = a{Person}--age{int};
-    return a{Person}--age{int};
-}

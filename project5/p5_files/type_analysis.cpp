@@ -53,6 +53,9 @@ void FnDeclNode::typeAnalysis(TypeAnalysis * ta){
 	//Note: this function may need extra code
 
 	const DataType * retType = myRetType->getType();
+	const FnType* symAsFn = retType->asFn();
+	ta->setCurrentFnType(symAsFn);
+	
 	for (auto stmt : *myBody){
 		stmt->typeAnalysis(ta);
 	}

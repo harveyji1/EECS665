@@ -1,5 +1,0 @@
-glob : bool;
-main : () int {
-	a : int;
-	glob = a;
-}

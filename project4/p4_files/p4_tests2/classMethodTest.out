@@ -1,7 +1,0 @@
-calc{calc} : class {
-    fn{(int,int)->int} : (a{int} : int, b{int} : int) int  {
-        give a{int} * b{int};
-    }
-};
-Calculator{calc} : calc{calc};
-product{int} : int = 5;
