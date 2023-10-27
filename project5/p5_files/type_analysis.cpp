@@ -4,6 +4,7 @@
 #include "types.hpp"
 #include "name_analysis.hpp"
 #include "type_analysis.hpp"
+#include <iostream>
 
 namespace drewno_mars{
 
@@ -55,7 +56,7 @@ void FnDeclNode::typeAnalysis(TypeAnalysis * ta){
 	const DataType * retType = myRetType->getType();
 	const FnType* symAsFn = retType->asFn();
 	ta->setCurrentFnType(symAsFn);
-
+	
 	for (auto stmt : *myBody){
 		stmt->typeAnalysis(ta);
 	}
@@ -120,7 +121,6 @@ void DeclNode::typeAnalysis(TypeAnalysis * ta){
 }
 
 void VarDeclNode::typeAnalysis(TypeAnalysis * ta){
-
 	if(myInit != nullptr){
 		myInit->typeAnalysis(ta);
 		const DataType * myInitType = ta->nodeType(myInit);
@@ -138,6 +138,7 @@ void VarDeclNode::typeAnalysis(TypeAnalysis * ta){
 		else{
 			ta->setCurrentFnType(fnTypePlaceholder);
 			ta->errAssignOpr(this->pos());
+			ta->nodeType(this, ErrorType::produce());
 		}
 	}
 	else{
@@ -179,24 +180,21 @@ void CallExpNode::typeAnalysis(TypeAnalysis * ta){
 			argArr[arrPos] = arg;
 			++arrPos;
 		}
-		int sizeOfargArr = sizeof(argArr);
+		
 		arrPos = 0;
-		const std::list<const DataType *> * types = formalTypes->getTypes(); 
-		for (auto type : *types)
-		{
-			argArr[arrPos]->typeAnalysis(ta);
-			auto argType = ta->nodeType(argArr[arrPos]);
-			if (type != argType)
-			{
-				ta->errArgMatch(myCallee->pos());
-				error = true;
-			}
-			++arrPos;
+	// 	const std::list<const DataType *> * types = formalTypes->getTypes(); 
+	// 	for (auto type : *types)
+	// 	{
+	// 		argArr[arrPos]->typeAnalysis(ta);
+	// 		auto argType = ta->nodeType(argArr[arrPos]);
+	// 		if (type != argType)
+	// 		{
+	// 			ta->errArgMatch(myCallee->pos());
+	// 			error = true;
+	// 		}
+	// 		++arrPos;
 			
-			if(arrPos > sizeOfargArr){
-				break;
-			}
-		}
+	// 	}
 	}
 	if (error)
 	{
@@ -205,11 +203,11 @@ void CallExpNode::typeAnalysis(TypeAnalysis * ta){
 	else {
 		ta->nodeType(this, fnType->asFn()->getReturnType());
 	}
-	
 }
 
 void CallStmtNode::typeAnalysis(TypeAnalysis * ta){
-	
+	myCallExp->typeAnalysis(ta);
+	ta->nodeType(this, ta->nodeType(myCallExp));
 }
 
 void ExitStmtNode::typeAnalysis(TypeAnalysis * ta){
