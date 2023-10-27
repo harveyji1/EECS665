@@ -55,7 +55,7 @@ void FnDeclNode::typeAnalysis(TypeAnalysis * ta){
 	const DataType * retType = myRetType->getType();
 	const FnType* symAsFn = retType->asFn();
 	ta->setCurrentFnType(symAsFn);
-	
+
 	for (auto stmt : *myBody){
 		stmt->typeAnalysis(ta);
 	}
@@ -120,10 +120,29 @@ void DeclNode::typeAnalysis(TypeAnalysis * ta){
 }
 
 void VarDeclNode::typeAnalysis(TypeAnalysis * ta){
-	// VarDecls always pass type analysis, since they 
-	// are never used in an expression. You may choose
-	// to type them void (like this), as discussed in class
+
+	if(myInit != nullptr){
+		myInit->typeAnalysis(ta);
+		const DataType * myInitType = ta->nodeType(myInit);
+		//some placeholder, not sure how else to compare VarDecl type
+		const FnType* fnTypePlaceholder = ta->getCurrentFnType();
+
+		const DataType* myVarDeclType = myType->getType();
+		const FnType* symAsVar = myVarDeclType->asFn();
+		ta->setCurrentFnType(symAsVar);
+
+		if(myInitType==ta->getCurrentFnType()){
+			ta->setCurrentFnType(fnTypePlaceholder);
+			ta->nodeType(this, BasicType::produce(VOID));
+		}
+		else{
+			ta->setCurrentFnType(fnTypePlaceholder);
+			ta->errAssignOpr(this->pos());
+		}
+	}
+	else{
 	ta->nodeType(this, BasicType::produce(VOID));
+	}
 }
 
 void ClassDefnNode::typeAnalysis(TypeAnalysis * ta){
@@ -138,6 +157,54 @@ void IDNode::typeAnalysis(TypeAnalysis * ta){
 }
 
 void CallExpNode::typeAnalysis(TypeAnalysis * ta){
+	bool error = false;
+	SemSymbol * sym = myCallee->getSymbol();
+	std::string myKind = sym->kindToString(sym->getKind());
+	const DataType * fnType = sym->getDataType();
+	if (myKind != "fn") {
+		ta->errCallee(myCallee->pos());
+		error = true;
+	}
+	else {
+		const TypeList * formalTypes = fnType->asFn()->getFormalTypes();
+		if (formalTypes->count() != myArgs->size())
+		{
+			ta->errArgCount(this->pos());
+			error = true;
+		}
+		
+		ExpNode ** argArr = new ExpNode*[myArgs->size()];
+		int arrPos = 0;
+		for (auto arg : *myArgs) {
+			argArr[arrPos] = arg;
+			++arrPos;
+		}
+		int sizeOfargArr = sizeof(argArr);
+		arrPos = 0;
+		const std::list<const DataType *> * types = formalTypes->getTypes(); 
+		for (auto type : *types)
+		{
+			argArr[arrPos]->typeAnalysis(ta);
+			auto argType = ta->nodeType(argArr[arrPos]);
+			if (type != argType)
+			{
+				ta->errArgMatch(myCallee->pos());
+				error = true;
+			}
+			++arrPos;
+			
+			if(arrPos > sizeOfargArr){
+				break;
+			}
+		}
+	}
+	if (error)
+	{
+		ta->nodeType(this, ErrorType::produce());
+	}
+	else {
+		ta->nodeType(this, fnType->asFn()->getReturnType());
+	}
 	
 }
 
