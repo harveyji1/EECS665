@@ -1,7 +1,7 @@
 fn: () int{
     hello: int = 1;
     if(hello!=true){
-        give hello;
+        hello = 5;
     }
 }
 

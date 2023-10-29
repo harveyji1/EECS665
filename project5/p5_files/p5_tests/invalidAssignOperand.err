@@ -1,2 +1,2 @@
-FATAL [9,5]-[9,10]: Invalid assignment operation
+FATAL [9,5]-[9,6]: Invalid assignment operand
 Type Analysis Failed

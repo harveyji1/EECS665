@@ -1,2 +1,2 @@
-FATAL [4,2]-[4,7]: Invalid assignment operation
+FATAL [5,2]-[5,7]: Invalid assignment operation
 Type Analysis Failed
