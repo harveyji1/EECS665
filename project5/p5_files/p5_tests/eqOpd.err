@@ -1,2 +1,2 @@
 FATAL [9,8]-[9,18]: Invalid equality operation
-Something in the compiler is broken: No type for node 
+Type Analysis Failed

@@ -168,7 +168,7 @@ void VarDeclNode::typeAnalysis(TypeAnalysis * ta){
 }
 
 void ClassDefnNode::typeAnalysis(TypeAnalysis * ta){
-	ta->nodeType(this, BasicType::produce(CLASS)); //think something is wrong here, with classes
+	ta->nodeType(this, BasicType::produce(VOID)); //think something is wrong here, with classes
 }
 
 void IDNode::typeAnalysis(TypeAnalysis * ta){
@@ -275,6 +275,11 @@ void IfStmtNode::typeAnalysis(TypeAnalysis * ta){
 
 	const DataType * CondType = ta->nodeType(myCond);
 
+	if(CondType->asError()){
+		ta->nodeType(this, ErrorType::produce());
+		return;
+	}
+
 	if (CondType->isBool())
 	{
 		for (auto stmt : *myBody)
@@ -364,12 +369,16 @@ void EqualsNode::typeAnalysis(TypeAnalysis * ta){
 			}
 			else {
 				ta->errEqOpr(this->pos());
+				ta->nodeType(this, ErrorType::produce());
+				return;
 			}
 		}
 		else {
 			if (!myExp2->isFnCall())
 			{
 				ta->errEqOpd(myExp2->pos());
+				ta->nodeType(this, ErrorType::produce());
+				return;
 			}
 			
 			if (left == right->asFn()->getReturnType())
@@ -379,6 +388,8 @@ void EqualsNode::typeAnalysis(TypeAnalysis * ta){
 			}
 			else {
 				ta->errEqOpr(this->pos());
+				ta->nodeType(this, ErrorType::produce());
+				return;
 			}
 		}
 	}
