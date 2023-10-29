@@ -1,0 +1,3 @@
+FATAL [7,10]-[7,11]: Attempt to output a class
+FATAL [8,7]-[8,8]: Attempt to assign user input to class
+Type Analysis Failed

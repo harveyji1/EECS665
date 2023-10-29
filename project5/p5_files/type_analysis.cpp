@@ -168,7 +168,7 @@ void VarDeclNode::typeAnalysis(TypeAnalysis * ta){
 }
 
 void ClassDefnNode::typeAnalysis(TypeAnalysis * ta){
-	ta->nodeType(this, BasicType::produce(VOID));
+	ta->nodeType(this, BasicType::produce(CLASS)); //think something is wrong here, with classes
 }
 
 void IDNode::typeAnalysis(TypeAnalysis * ta){
@@ -236,6 +236,32 @@ void ExitStmtNode::typeAnalysis(TypeAnalysis * ta){
 }
 
 void GiveStmtNode::typeAnalysis(TypeAnalysis * ta){
+	mySrc->typeAnalysis(ta);
+
+	const DataType * SrcType = ta->nodeType(mySrc);
+
+	if (SrcType->asFn() != nullptr)
+	{
+		ta->errOutputFn(this->pos());
+		ta->nodeType(this, ErrorType::produce());
+	}
+
+	if (SrcType->isVoid())
+	{
+		ta->errOutputVoid(this->pos());
+		ta->nodeType(this, ErrorType::produce());
+	}
+
+	if(SrcType->isClass()){
+		ta->errOutputClass(this->pos());
+		ta->nodeType(this, ErrorType::produce());
+	}
+
+	if (SrcType->isBool() || SrcType->isInt() || SrcType->isString())
+	{
+		ta->nodeType(this, SrcType);
+		return;
+	}
 	
 }
 
@@ -244,23 +270,23 @@ void IfElseStmtNode::typeAnalysis(TypeAnalysis * ta){
 }
 
 void IfStmtNode::typeAnalysis(TypeAnalysis * ta){
-	//CAUSING SEG FAULT
-	// myCond->typeAnalysis(ta);
+	
+	myCond->typeAnalysis(ta);
 
-	// const DataType * CondType = ta->nodeType(myCond);
+	const DataType * CondType = ta->nodeType(myCond);
 
-	// // if (CondType->isBool() || CondType->asFn()->getReturnType()->isBool())
-	// // {
-	// // 	for (auto stmt : *myBody)
-	// // 	{
-	// // 		stmt->typeAnalysis(ta);
-	// // 	}
-	// // 	ta->nodeType(this, BasicType::produce(VOID));
-	// // 	return;
-	// // }
+	if (CondType->isBool())
+	{
+		for (auto stmt : *myBody)
+		{
+			stmt->typeAnalysis(ta);
+		}
+		ta->nodeType(this, BasicType::produce(VOID));
+		return;
+	}
 
-	// ta->errCond(myCond->pos());
-	// ta->nodeType(this, ErrorType::produce());
+	ta->errCond(myCond->pos());
+	ta->nodeType(this, ErrorType::produce());
 }
 
 void PostDecStmtNode::typeAnalysis(TypeAnalysis * ta){
@@ -322,7 +348,40 @@ void DivideNode::typeAnalysis(TypeAnalysis * ta){
 }
 
 void EqualsNode::typeAnalysis(TypeAnalysis * ta){
-	
+	myExp1->typeAnalysis(ta);
+	myExp2->typeAnalysis(ta);
+	const DataType * left = ta->nodeType(myExp1);
+	const DataType * right = ta->nodeType(myExp2);
+
+	if (left->asFn() == nullptr)
+	{
+		if (right->asFn() == nullptr)
+		{
+			if (left == right)
+			{
+				ta->nodeType(this, BasicType::produce(BOOL));
+				return;
+			}
+			else {
+				ta->errEqOpr(this->pos());
+			}
+		}
+		else {
+			if (!myExp2->isFnCall())
+			{
+				ta->errEqOpd(myExp2->pos());
+			}
+			
+			if (left == right->asFn()->getReturnType())
+			{
+				ta->nodeType(this, BasicType::produce(BOOL));
+				return;
+			}
+			else {
+				ta->errEqOpr(this->pos());
+			}
+		}
+	}
 }
 
 void GreaterEqNode::typeAnalysis(TypeAnalysis * ta){

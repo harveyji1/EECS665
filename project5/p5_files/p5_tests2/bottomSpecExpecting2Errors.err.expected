@@ -1,0 +1,6 @@
+FATAL [6,6]-[6,10]: Arithmetic operator applied to invalid operand
+FATAL [6,13]-[6,20]: Arithmetic operator applied to invalid operand
+FATAL [9,15]-[9,19]: Type of actual does not match type of formal
+FATAL [9,13]-[9,20]: Arithmetic operator applied to invalid operand
+FATAL [12,6]-[12,13]: Function call with wrong number of args
+Type Analysis Failed

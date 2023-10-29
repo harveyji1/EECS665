@@ -5,7 +5,8 @@ student: class{
 fn: () int{
     hello: int = 1;
     myStudent: student;
-    if(myStudent==1){
+    bye: bool = true;
+    if(bye==hello){
         give hello;
     }
 }

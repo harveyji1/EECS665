@@ -1,0 +1,5 @@
+FATAL [13,14]-[13,18]: Type of actual does not match type of formal
+FATAL [13,20]-[13,21]: Type of actual does not match type of formal
+FATAL [16,2]-[16,10]: Invalid assignment operation
+FATAL [17,2]-[17,13]: Invalid assignment operation
+Type Analysis Failed

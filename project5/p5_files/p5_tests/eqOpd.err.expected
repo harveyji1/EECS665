@@ -1,2 +1,2 @@
-FATAL [8,8]-[8,17]: Invalid equality operand
+FATAL [9,8]-[9,18]: Invalid equality operation
 Type Analysis Failed
