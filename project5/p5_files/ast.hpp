@@ -310,7 +310,7 @@ public:
 	void unparseNested(std::ostream& out) override;
 	bool nameAnalysis(SymbolTable * symTab) override;
 	virtual void typeAnalysis(TypeAnalysis *) override;
-	bool isFnCall(){ return true;}
+	bool isFnCall(){ return true;};
 private:
 	LocNode * myCallee;
 	std::list<ExpNode *> * myArgs;

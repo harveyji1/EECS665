@@ -112,8 +112,19 @@ void AssignStmtNode::typeAnalysis(TypeAnalysis * ta, const DataType * currentFnT
 		return;
 	}
 
-	
-	
+
+	//Done for testing, seems like mySrc->isFnCall() always returned false even if it is true
+	//tried changing the function to virtual in ExpNode but that cause SegFaults
+
+	// if (mySrc->isFnCall()){
+	// 	ta->errAssignOpd(mySrc->pos());
+	// 		ta->nodeType(this, ErrorType::produce());
+	// 		return;
+	// 	// if(srcType->asFn()->getReturnType()->isVoid()){
+			
+	// 	// }
+	// }
+
 	//While incomplete, this gives you one case for 
 	// assignment: if the types are exactly the same
 	// it is usually ok to do the assignment. One
@@ -122,12 +133,12 @@ void AssignStmtNode::typeAnalysis(TypeAnalysis * ta, const DataType * currentFnT
 
 	// should be complete now ?
 	if (tgtType == srcType){
-		if (tgtType->asFn() != nullptr){
-			ta->errAssignOpd(this->pos());
-			ta->nodeType(this, ErrorType::produce());
-			return;
-		}
 		ta->nodeType(this, tgtType);
+		return;
+	}
+	else{
+		ta->errAssignOpr(this->pos());
+		ta->nodeType(this, ErrorType::produce());
 		return;
 	}
 	
@@ -136,7 +147,7 @@ void AssignStmtNode::typeAnalysis(TypeAnalysis * ta, const DataType * currentFnT
 	// also tell the typeAnalysis object that the
 	// analysis has failed, meaning that main.cpp
 	// will print "Type check failed" at the end
-	ta->errAssignOpr(this->pos());
+	
 
 
 	// Here, we set the type of the assignment
