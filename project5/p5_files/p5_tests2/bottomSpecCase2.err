@@ -1,3 +1,2 @@
 FATAL [6,7]-[6,11]: Arithmetic operator applied to invalid operand
-FATAL [6,7]-[6,15]: Arithmetic operator applied to invalid operand
 Type Analysis Failed

@@ -116,14 +116,14 @@ void AssignStmtNode::typeAnalysis(TypeAnalysis * ta, const DataType * currentFnT
 	//Done for testing, seems like mySrc->isFnCall() always returned false even if it is true
 	//tried changing the function to virtual in ExpNode but that cause SegFaults
 
-	// if (mySrc->isFnCall()){
-	// 	ta->errAssignOpd(mySrc->pos());
-	// 		ta->nodeType(this, ErrorType::produce());
-	// 		return;
+	if (mySrc->isFnCall()){
+		ta->errAssignOpd(mySrc->pos());
+			ta->nodeType(this, ErrorType::produce());
+			return;
 	// 	// if(srcType->asFn()->getReturnType()->isVoid()){
 			
 	// 	// }
-	// }
+	}
 
 	//While incomplete, this gives you one case for 
 	// assignment: if the types are exactly the same
@@ -186,6 +186,12 @@ void CallExpNode::typeAnalysis(TypeAnalysis * ta){
 	SemSymbol * sym = myCallee->getSymbol();
 	std::string myKind = sym->kindToString(sym->getKind());
 	const DataType * fnType = sym->getDataType();
+
+	if(fnType->asError()){
+		ta->nodeType(this, ErrorType::produce());
+		return;
+	}
+
 	if (myKind != "fn") {
 		ta->errCallee(myCallee->pos());
 		error = true;
@@ -211,6 +217,12 @@ void CallExpNode::typeAnalysis(TypeAnalysis * ta){
 			{
 				argArr[arrPos]->typeAnalysis(ta);
 				auto argType = ta->nodeType(argArr[arrPos]);
+
+				if(argType->asError()){
+					ta->nodeType(this, ErrorType::produce());
+					return;
+				}
+
 				if (type != argType)
 				{
 					ta->errArgMatch(argArr[arrPos]->pos());
@@ -453,11 +465,11 @@ void TrueNode::typeAnalysis(TypeAnalysis * ta){
 }
 
 void StrLitNode::typeAnalysis(TypeAnalysis * ta){
-	ta->nodeType(this, BasicType::produce(VOID));
+	ta->nodeType(this, BasicType::produce(STRING));
 }
 
 void FalseNode::typeAnalysis(TypeAnalysis * ta){
-	ta->nodeType(this, BasicType::produce(STRING));
+	ta->nodeType(this, BasicType::produce(BOOL));
 }
 
 void MemberFieldExpNode::typeAnalysis(TypeAnalysis * ta){
@@ -473,6 +485,12 @@ void AndNode::typeAnalysis(TypeAnalysis * ta){
 	myExp2->typeAnalysis(ta);
 	const DataType * left = ta->nodeType(myExp1);
 	const DataType * right = ta->nodeType(myExp2);
+
+	if (left->asError() || right->asError()){
+			ta->nodeType(this, ErrorType::produce());
+			return;
+		}
+
 	if (left->asFn() == nullptr)
 	{
 		if (!left->isBool())
@@ -512,6 +530,12 @@ void DivideNode::typeAnalysis(TypeAnalysis * ta){
 	myExp2->typeAnalysis(ta);
 	const DataType * left = ta->nodeType(myExp1);
 	const DataType * right = ta->nodeType(myExp2);
+
+	if (left->asError() || right->asError()){
+			ta->nodeType(this, ErrorType::produce());
+			return;
+		}
+
 	if (left->asFn() == nullptr)
 	{
 		if (!left->isInt())
@@ -551,6 +575,11 @@ void EqualsNode::typeAnalysis(TypeAnalysis * ta){
 	myExp2->typeAnalysis(ta);
 	const DataType * left = ta->nodeType(myExp1);
 	const DataType * right = ta->nodeType(myExp2);
+
+	if (left->asError() || right->asError()){
+			ta->nodeType(this, ErrorType::produce());
+			return;
+		}
 
 	if (left->asFn() == nullptr)
 	{
@@ -595,6 +624,11 @@ void GreaterEqNode::typeAnalysis(TypeAnalysis * ta){
 	const DataType * left = ta->nodeType(myExp1);
 	const DataType * right = ta->nodeType(myExp2);
 
+	if (left->asError() || right->asError()){
+			ta->nodeType(this, ErrorType::produce());
+			return;
+		}
+
 	if (left->asFn() == nullptr)
 	{
 		if (right->asFn() == nullptr)
@@ -637,6 +671,12 @@ void GreaterNode::typeAnalysis(TypeAnalysis * ta){
 	myExp2->typeAnalysis(ta);
 	const DataType * left = ta->nodeType(myExp1);
 	const DataType * right = ta->nodeType(myExp2);
+
+	if (left->asError() || right->asError()){
+			ta->nodeType(this, ErrorType::produce());
+			return;
+		}
+
 	if (left->asFn() == nullptr)
 	{
 		if (!left->isInt())
@@ -676,6 +716,17 @@ void LessEqNode::typeAnalysis(TypeAnalysis * ta){
 	myExp2->typeAnalysis(ta);
 	const DataType * left = ta->nodeType(myExp1);
 	const DataType * right = ta->nodeType(myExp2);
+
+	if (left->asError() || right->asError()){
+			ta->nodeType(this, ErrorType::produce());
+			return;
+		}
+
+if (left->asError() || right->asError()){
+			ta->nodeType(this, ErrorType::produce());
+			return;
+		}
+
 	if (left->asFn() == nullptr)
 	{
 		if (!left->isInt())
@@ -715,6 +766,12 @@ void LessNode::typeAnalysis(TypeAnalysis * ta){
 	myExp2->typeAnalysis(ta);
 	const DataType * left = ta->nodeType(myExp1);
 	const DataType * right = ta->nodeType(myExp2);
+
+	if (left->asError() || right->asError()){
+			ta->nodeType(this, ErrorType::produce());
+			return;
+		}
+
 	if (left->asFn() == nullptr)
 	{
 		if (!left->isInt())
@@ -754,6 +811,12 @@ void MinusNode::typeAnalysis(TypeAnalysis * ta){
 	myExp2->typeAnalysis(ta);
 	const DataType * left = ta->nodeType(myExp1);
 	const DataType * right = ta->nodeType(myExp2);
+
+	if (left->asError() || right->asError()){
+			ta->nodeType(this, ErrorType::produce());
+			return;
+		}
+
 	if (left->asFn() == nullptr)
 	{
 		if (!left->isInt())
@@ -793,6 +856,11 @@ void NotEqualsNode::typeAnalysis(TypeAnalysis * ta){
 	myExp2->typeAnalysis(ta);
 	const DataType * left = ta->nodeType(myExp1);
 	const DataType * right = ta->nodeType(myExp2);
+
+	if (left->asError() || right->asError()){
+			ta->nodeType(this, ErrorType::produce());
+			return;
+		}
 
 	if (left->asFn() == nullptr)
 	{
@@ -837,6 +905,12 @@ void OrNode::typeAnalysis(TypeAnalysis * ta){
 	myExp2->typeAnalysis(ta);
 	const DataType * left = ta->nodeType(myExp1);
 	const DataType * right = ta->nodeType(myExp2);
+
+if (left->asError() || right->asError()){
+			ta->nodeType(this, ErrorType::produce());
+			return;
+		}
+
 	if (left->asFn() == nullptr)
 	{
 		if (!left->isBool())
@@ -876,6 +950,12 @@ void PlusNode::typeAnalysis(TypeAnalysis * ta){
 	myExp2->typeAnalysis(ta);
 	const DataType * left = ta->nodeType(myExp1);
 	const DataType * right = ta->nodeType(myExp2);
+
+	if (left->asError() || right->asError()){
+			ta->nodeType(this, ErrorType::produce());
+			return;
+		}
+
 	if (left->asFn() == nullptr)
 	{
 		if (!left->isInt())
@@ -915,6 +995,12 @@ void TimesNode::typeAnalysis(TypeAnalysis * ta){
 	myExp2->typeAnalysis(ta);
 	const DataType * left = ta->nodeType(myExp1);
 	const DataType * right = ta->nodeType(myExp2);
+
+	if (left->asError() || right->asError()){
+			ta->nodeType(this, ErrorType::produce());
+			return;
+		}
+
 	if (left->asFn() == nullptr)
 	{
 		if (!left->isInt())
@@ -958,6 +1044,11 @@ void NegNode::typeAnalysis(TypeAnalysis * ta){
 
 	const DataType * ExpType = ta->nodeType(myExp);
 
+	if (ExpType->asError()){
+			ta->nodeType(this, ErrorType::produce());
+			return;
+		}
+
 	//commented code creates segfault
 	if (ExpType->isInt() /*|| ExpType->asFn()->getReturnType()->isInt()*/ )
 	{
@@ -983,6 +1074,11 @@ void NotNode::typeAnalysis(TypeAnalysis * ta){
 	myExp->typeAnalysis(ta);
 
 	const DataType * ExpType = ta->nodeType(myExp);
+
+	if (ExpType->asError()){
+			ta->nodeType(this, ErrorType::produce());
+			return;
+		}
 
 	//commented code creates segfault
 	if (ExpType->isInt() /*|| ExpType->asFn()->getReturnType()->isInt()*/ )
