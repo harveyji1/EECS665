@@ -531,43 +531,45 @@ void DivideNode::typeAnalysis(TypeAnalysis * ta){
 	const DataType * left = ta->nodeType(myExp1);
 	const DataType * right = ta->nodeType(myExp2);
 
+	bool illTyped = false;
+
+
+	//Check if the LHS needs to throw an alert
+	// left is int (no alert), left is prefect int (no alert), left is ERROR (no alert) 
+	// else: throw an alert, set a "ill-typed flag"
+
+	if (left->isInt() || left->isPerfect() || left->asError()){
+		// do nothing
+	} else{
+		ta->errMathOpd(myExp1->pos());
+		illTyped = true;
+	}
+
+    // rhs is int (no alert), rhs is prefect int (no alert), rhs is ERROR (no alert) 
+	// else: throw an alert. set an ill-typed flag
+
+	if (right->isInt() || right->isPerfect() || right->asError()){
+		// do nothing
+	} else{
+		ta->errMathOpd(myExp2->pos());
+		illTyped = true;
+	}
+
 	if (left->asError() || right->asError()){
 			ta->nodeType(this, ErrorType::produce());
-			return;
+			// set an ill-typed flag
+			illTyped = true;
+	//		return;
 		}
 
-	if (left->asFn() == nullptr)
-	{
-		if (!left->isInt())
-		{
-			ta->errMathOpd(myExp1->pos());
-		}
-	}
-	else {
-		if (!left->asFn()->getReturnType()->isInt() || !myExp1->isFnCall())
-		{
-			ta->errMathOpd(myExp1->pos());
-		}
-	}
-	if (right->asFn() == nullptr)
-	{
-		if (!right->isInt())
-		{
-			ta->errMathOpd(myExp2->pos());
-		}
-	}
-	else {
-		if (!right->asFn()->getReturnType()->isInt() || !myExp2->isFnCall())
-		{
-			ta->errMathOpd(myExp2->pos());
-		}
-	}
-	if (!ta->passed())
-	{
+	//if ill-typed: set my type to error
+	//else: set my type to int
+	if (illTyped){
 		ta->nodeType(this, ErrorType::produce());
-		return;
 	}
-	ta->nodeType(this, BasicType::produce(INT));
+	else{
+		ta->nodeType(this, BasicType::produce(INT));
+	}
 }
 
 void EqualsNode::typeAnalysis(TypeAnalysis * ta){
@@ -812,43 +814,45 @@ void MinusNode::typeAnalysis(TypeAnalysis * ta){
 	const DataType * left = ta->nodeType(myExp1);
 	const DataType * right = ta->nodeType(myExp2);
 
+	bool illTyped = false;
+
+
+	//Check if the LHS needs to throw an alert
+	// left is int (no alert), left is prefect int (no alert), left is ERROR (no alert) 
+	// else: throw an alert, set a "ill-typed flag"
+
+	if (left->isInt() || left->isPerfect() || left->asError()){
+		// do nothing
+	} else{
+		ta->errMathOpd(myExp1->pos());
+		illTyped = true;
+	}
+
+    // rhs is int (no alert), rhs is prefect int (no alert), rhs is ERROR (no alert) 
+	// else: throw an alert. set an ill-typed flag
+
+	if (right->isInt() || right->isPerfect() || right->asError()){
+		// do nothing
+	} else{
+		ta->errMathOpd(myExp2->pos());
+		illTyped = true;
+	}
+
 	if (left->asError() || right->asError()){
 			ta->nodeType(this, ErrorType::produce());
-			return;
+			// set an ill-typed flag
+			illTyped = true;
+	//		return;
 		}
 
-	if (left->asFn() == nullptr)
-	{
-		if (!left->isInt())
-		{
-			ta->errMathOpd(myExp1->pos());
-		}
-	}
-	else {
-		if (!left->asFn()->getReturnType()->isInt() || !myExp1->isFnCall())
-		{
-			ta->errMathOpd(myExp1->pos());
-		}
-	}
-	if (right->asFn() == nullptr)
-	{
-		if (!right->isInt())
-		{
-			ta->errMathOpd(myExp2->pos());
-		}
-	}
-	else {
-		if (!right->asFn()->getReturnType()->isInt() || !myExp2->isFnCall())
-		{
-			ta->errMathOpd(myExp2->pos());
-		}
-	}
-	if (!ta->passed())
-	{
+	//if ill-typed: set my type to error
+	//else: set my type to int
+	if (illTyped){
 		ta->nodeType(this, ErrorType::produce());
-		return;
 	}
-	ta->nodeType(this, BasicType::produce(INT));
+	else{
+		ta->nodeType(this, BasicType::produce(INT));
+	}
 }
 
 void NotEqualsNode::typeAnalysis(TypeAnalysis * ta){
@@ -951,43 +955,78 @@ void PlusNode::typeAnalysis(TypeAnalysis * ta){
 	const DataType * left = ta->nodeType(myExp1);
 	const DataType * right = ta->nodeType(myExp2);
 
+	bool illTyped = false;
+
+
+	//Check if the LHS needs to throw an alert
+	// left is int (no alert), left is prefect int (no alert), left is ERROR (no alert) 
+	// else: throw an alert, set a "ill-typed flag"
+
+	if (left->isInt() || left->isPerfect() || left->asError()){
+		// do nothing
+	} else{
+		ta->errMathOpd(myExp1->pos());
+		illTyped = true;
+	}
+
+    // rhs is int (no alert), rhs is prefect int (no alert), rhs is ERROR (no alert) 
+	// else: throw an alert. set an ill-typed flag
+
+	if (right->isInt() || right->isPerfect() || right->asError()){
+		// do nothing
+	} else{
+		ta->errMathOpd(myExp2->pos());
+		illTyped = true;
+	}
+
 	if (left->asError() || right->asError()){
 			ta->nodeType(this, ErrorType::produce());
-			return;
+			// set an ill-typed flag
+			illTyped = true;
+	//		return;
 		}
 
-	if (left->asFn() == nullptr)
-	{
-		if (!left->isInt())
-		{
-			ta->errMathOpd(myExp1->pos());
-		}
-	}
-	else {
-		if (!left->asFn()->getReturnType()->isInt() || !myExp1->isFnCall())
-		{
-			ta->errMathOpd(myExp1->pos());
-		}
-	}
-	if (right->asFn() == nullptr)
-	{
-		if (!right->isInt())
-		{
-			ta->errMathOpd(myExp2->pos());
-		}
-	}
-	else {
-		if (!right->asFn()->getReturnType()->isInt() || !myExp2->isFnCall())
-		{
-			ta->errMathOpd(myExp2->pos());
-		}
-	}
-	if (!ta->passed())
-	{
+	//if ill-typed: set my type to error
+	//else: set my type to int
+	if (illTyped){
 		ta->nodeType(this, ErrorType::produce());
-		return;
 	}
-	ta->nodeType(this, BasicType::produce(INT));
+	else{
+		ta->nodeType(this, BasicType::produce(INT));
+	}
+
+	//if (left->asFn() == nullptr)
+	//{
+		//if (!left->isInt() && !left->asError())
+		//{
+		//	ta->errMathOpd(myExp1->pos());
+		//}
+	//}
+	//else {
+	//	if (!left->asFn()->getReturnType()->isInt() || !myExp1->isFnCall())
+	//	{
+	//		ta->errMathOpd(myExp1->pos());
+	//	}
+	//}
+	//if (right->asFn() == nullptr)
+	//{
+	//	if (!right->isInt())
+	//	{
+	//		ta->errMathOpd(myExp2->pos());
+	//	}
+	//}
+	//else {
+	//	if (!right->asFn()->getReturnType()->isInt() || !myExp2->isFnCall())
+	//	{
+	//		ta->errMathOpd(myExp2->pos());
+	//	}
+	//}
+	//if (!ta->passed())
+	//{
+	//	ta->nodeType(this, ErrorType::produce());
+	//	return;
+	//}
+	//ta->nodeType(this, BasicType::produce(INT));
 }
 
 void TimesNode::typeAnalysis(TypeAnalysis * ta){
@@ -996,43 +1035,45 @@ void TimesNode::typeAnalysis(TypeAnalysis * ta){
 	const DataType * left = ta->nodeType(myExp1);
 	const DataType * right = ta->nodeType(myExp2);
 
+	bool illTyped = false;
+
+
+	//Check if the LHS needs to throw an alert
+	// left is int (no alert), left is prefect int (no alert), left is ERROR (no alert) 
+	// else: throw an alert, set a "ill-typed flag"
+
+	if (left->isInt() || left->isPerfect() || left->asError()){
+		// do nothing
+	} else{
+		ta->errMathOpd(myExp1->pos());
+		illTyped = true;
+	}
+
+    // rhs is int (no alert), rhs is prefect int (no alert), rhs is ERROR (no alert) 
+	// else: throw an alert. set an ill-typed flag
+
+	if (right->isInt() || right->isPerfect() || right->asError()){
+		// do nothing
+	} else{
+		ta->errMathOpd(myExp2->pos());
+		illTyped = true;
+	}
+
 	if (left->asError() || right->asError()){
 			ta->nodeType(this, ErrorType::produce());
-			return;
+			// set an ill-typed flag
+			illTyped = true;
+	//		return;
 		}
 
-	if (left->asFn() == nullptr)
-	{
-		if (!left->isInt())
-		{
-			ta->errMathOpd(myExp1->pos());
-		}
-	}
-	else {
-		if (!left->asFn()->getReturnType()->isInt() || !myExp1->isFnCall())
-		{
-			ta->errMathOpd(myExp1->pos());
-		}
-	}
-	if (right->asFn() == nullptr)
-	{
-		if (!right->isInt())
-		{
-			ta->errMathOpd(myExp2->pos());
-		}
-	}
-	else {
-		if (!right->asFn()->getReturnType()->isInt() || !myExp2->isFnCall())
-		{
-			ta->errMathOpd(myExp2->pos());
-		}
-	}
-	if (!ta->passed())
-	{
+	//if ill-typed: set my type to error
+	//else: set my type to int
+	if (illTyped){
 		ta->nodeType(this, ErrorType::produce());
-		return;
 	}
-	ta->nodeType(this, BasicType::produce(INT));
+	else{
+		ta->nodeType(this, BasicType::produce(INT));
+	}
 }
 
 void UnaryExpNode::typeAnalysis(TypeAnalysis * ta){
