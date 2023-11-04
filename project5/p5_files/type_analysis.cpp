@@ -134,6 +134,7 @@ void AssignStmtNode::typeAnalysis(TypeAnalysis * ta, const DataType * currentFnT
 	// should be complete now ?
 	if (tgtType == srcType){
 		ta->nodeType(this, tgtType);
+		ta->nodeType(this, BasicType::produce(VOID));
 		return;
 	}
 	else{
@@ -374,7 +375,7 @@ void ReturnStmtNode::typeAnalysis(TypeAnalysis * ta, const DataType * currentFnT
 		returnType = BasicType::produce(VOID);
 	}
 	
-	if (currentFnType->isVoid() && (returnType->isBool() || returnType->isInt()))
+	if (currentFnType->isVoid())
 	{
 		Position * p = new Position(myExp->pos(), myExp->pos());
 		ta->extraRetValue(p);
@@ -618,6 +619,41 @@ void EqualsNode::typeAnalysis(TypeAnalysis * ta){
 			}
 		}
 	}
+	else {
+		if (right->asFn() == nullptr)
+		{
+			if (!myExp1->isFnCall())
+			{
+				ta->errEqOpd(myExp1->pos());
+			}
+			
+			if (left->asFn()->getReturnType() == right)
+			{
+				ta->nodeType(this, BasicType::produce(BOOL));
+				return;
+			}
+			else {
+				ta->errEqOpr(this->pos());
+			}
+		}
+		else {
+			if (!myExp1->isFnCall() || !myExp2->isFnCall())
+			{
+				ta->errEqOpd(this->pos());
+			}
+			
+			if (left->asFn()->getReturnType() == right->asFn()->getReturnType())
+			{
+				ta->nodeType(this, BasicType::produce(BOOL));
+				return;
+			}
+			else {
+				ta->errEqOpr(this->pos());
+			}
+			
+		}
+	}
+	ta->nodeType(this, ErrorType::produce());
 }
 
 void GreaterEqNode::typeAnalysis(TypeAnalysis * ta){
@@ -720,11 +756,6 @@ void LessEqNode::typeAnalysis(TypeAnalysis * ta){
 	const DataType * right = ta->nodeType(myExp2);
 
 	if (left->asError() || right->asError()){
-			ta->nodeType(this, ErrorType::produce());
-			return;
-		}
-
-if (left->asError() || right->asError()){
 			ta->nodeType(this, ErrorType::produce());
 			return;
 		}
@@ -973,10 +1004,17 @@ void PlusNode::typeAnalysis(TypeAnalysis * ta){
 	// else: throw an alert. set an ill-typed flag
 
 	if (right->isInt() || right->isPerfect() || right->asError()){
-		// do nothing
+		//do nothing
 	} else{
 		ta->errMathOpd(myExp2->pos());
 		illTyped = true;
+	}
+
+	if(myExp2->isFnCall()){
+		if(!(right->asFn()->getReturnType()->isInt())){
+			ta->errMathOpd(myExp2->pos());
+			illTyped = true;
+		}
 	}
 
 	if (left->asError() || right->asError()){

@@ -1,2 +1,2 @@
-FATAL [5,7]-[5,11]: Invalid equality operand
+FATAL [5,7]-[5,16]: Invalid equality operation
 Type Analysis Failed

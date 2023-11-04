@@ -1,5 +1,5 @@
 FATAL [6,6]-[6,7]: Relational operator applied to non-numeric operand
 FATAL [7,9]-[7,10]: Relational operator applied to non-numeric operand
 FATAL [8,9]-[8,10]: Relational operator applied to non-numeric operand
-FATAL [9,9]-[9,10]: Relational operator applied to non-numeric operand
+FATAL [9,9]-[9,15]: Invalid equality operation
 Type Analysis Failed
