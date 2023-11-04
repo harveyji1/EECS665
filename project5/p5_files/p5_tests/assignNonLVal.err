@@ -1,2 +1,2 @@
-FATAL [3,5]-[3,10]: Non-lval assignment
+FATAL [3,5]-[3,10]: Invalid assignment operation
 Type Analysis Failed

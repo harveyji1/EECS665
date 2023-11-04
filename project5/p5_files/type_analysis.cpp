@@ -107,10 +107,12 @@ void AssignStmtNode::typeAnalysis(TypeAnalysis * ta, const DataType * currentFnT
 		return;
 	}
 
-	if(tgtType->isPerfect()){
-		ta->errAssignNonLVal(this->pos());
-		illTyped=true;
-	}
+	//Commented out to follow Oracle
+
+	// if(tgtType->isPerfect()){
+	// 	ta->errAssignNonLVal(this->pos());
+	// 	illTyped=true;
+	// }
 
 	if(illTyped){
 		ta->nodeType(this, ErrorType::produce());
