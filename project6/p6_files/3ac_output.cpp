@@ -1,5 +1,12 @@
 #include "ast.hpp"
 
+//FnDeclNode
+//FormalDeclNode
+//CallExpNode
+//ExitStmt
+//GiveStmtNode
+//TakeStmtNode
+
 namespace drewno_mars{
 
 IRProgram * ProgramNode::to3AC(TypeAnalysis * ta){
@@ -45,11 +52,13 @@ Opd * StrLitNode::flatten(Procedure * proc){
 }
 
 Opd * TrueNode::flatten(Procedure * proc){
-	TODO(Implement me)
+	Opd * res = new LitOpd("1", 8);
+	return res;
 }
 
 Opd * FalseNode::flatten(Procedure * proc){
-	TODO(Implement me)
+	Opd * res = new LitOpd("0", 8);
+	return res;
 }
 
 Opd * CallExpNode::flatten(Procedure * proc){
@@ -57,99 +66,276 @@ Opd * CallExpNode::flatten(Procedure * proc){
 }
 
 Opd * NegNode::flatten(Procedure * proc){
-	TODO(Implement me)
+	Opd * child = myExp->flatten(proc);
+	size_t width = proc->getProg()->opWidth(this);
+	Opd * dst = proc->makeTmp(width);
+	UnaryOp opr = UnaryOp::NEG64;
+	Quad * quad = new UnaryOpQuad(dst, opr, child);
+	proc->addQuad(quad);
+	return dst;
 }
 
 Opd * NotNode::flatten(Procedure * proc){
-	TODO(Implement me)
+	Opd * child = myExp->flatten(proc);
+	size_t width = proc->getProg()->opWidth(myExp);
+	Opd * dst = proc->makeTmp(width);
+	Quad * quad = new UnaryOpQuad(dst, NOT64, child);
+	proc->addQuad(quad);
+	return dst;
 }
 
 Opd * PlusNode::flatten(Procedure * proc){
-	TODO(Implement me)
+	Opd * childL = myExp1->flatten(proc);
+	Opd * childR = myExp2->flatten(proc);
+	size_t width = proc->getProg()->opWidth(this);
+	Opd * dst = proc->makeTmp(width);
+	BinOp opr = BinOp::ADD64;
+	Quad * quad = new BinOpQuad(dst, opr, childL, childR);
+	proc->addQuad(quad);
+	return dst;
 }
 
 Opd * MinusNode::flatten(Procedure * proc){
-	TODO(Implement me)
+	Opd * childL = myExp1->flatten(proc);
+	Opd * childR = myExp2->flatten(proc);
+	size_t width = proc->getProg()->opWidth(this);
+	Opd * dst = proc->makeTmp(width);
+	BinOp opr = BinOp::SUB64;
+	Quad * quad = new BinOpQuad(dst, opr, childL, childR);
+	proc->addQuad(quad);
+	return dst;
 }
 
 Opd * TimesNode::flatten(Procedure * proc){
-	TODO(Implement me)
+	Opd * childL = myExp1->flatten(proc);
+	Opd * childR = myExp2->flatten(proc);
+	size_t width = proc->getProg()->opWidth(this);
+	Opd * dst = proc->makeTmp(width);
+	BinOp opr = BinOp::MULT64;
+	Quad * quad = new BinOpQuad(dst, opr, childL, childR);
+	proc->addQuad(quad);
+	return dst;
 }
 
 Opd * DivideNode::flatten(Procedure * proc){
-	TODO(Implement me)
+	Opd * op1 = this->myExp1->flatten(proc);
+	Opd * op2 = this->myExp2->flatten(proc);
+	size_t width = proc->getProg()->opWidth(this);
+	Opd * dst = proc->makeTmp(width);
+	BinOp opr = BinOp::DIV64;
+	BinOpQuad * quad = new BinOpQuad(dst, opr, op1, op2);
+	proc->addQuad(quad);
+	return dst;
 }
 
 Opd * AndNode::flatten(Procedure * proc){
-	TODO(Implement me)
+	Opd * op1 = this->myExp1->flatten(proc);
+	Opd * op2 = this->myExp2->flatten(proc);
+	size_t width = proc->getProg()->opWidth(this);
+	Opd * opRes = proc->makeTmp(width);
+	BinOpQuad * quad = new BinOpQuad(opRes, AND64, op1, op2);
+	proc->addQuad(quad);
+	return opRes;
 }
 
 Opd * OrNode::flatten(Procedure * proc){
-	TODO(Implement me)
+	Opd * op1 = this->myExp1->flatten(proc);
+	Opd * op2 = this->myExp2->flatten(proc);
+	size_t width = proc->getProg()->opWidth(this);
+	Opd * opRes = proc->makeTmp(width);
+	BinOpQuad * quad = new BinOpQuad(opRes, OR64, op1, op2);
+	proc->addQuad(quad);
+	return opRes;
 }
 
 Opd * EqualsNode::flatten(Procedure * proc){
-	TODO(Implement me)
+	Opd * op1 = this->myExp1->flatten(proc);
+	Opd * op2 = this->myExp2->flatten(proc);
+	size_t width = proc->getProg()->opWidth(this->myExp1);
+	size_t resWidth = Opd::width(BasicType::BOOL());
+	Opd * dst = proc->makeTmp(resWidth);
+	BinOp opr = BinOp::EQ64;
+	BinOpQuad * quad = new BinOpQuad(dst, opr, op1, op2);
+	proc->addQuad(quad);
+	return dst;
 }
 
 Opd * NotEqualsNode::flatten(Procedure * proc){
-	TODO(Implement me)
+	Opd * op1 = this->myExp1->flatten(proc);
+	Opd * op2 = this->myExp2->flatten(proc);
+	size_t width = proc->getProg()->opWidth(this->myExp1);
+	size_t resWidth = Opd::width(BasicType::BOOL());
+	Opd * dst = proc->makeTmp(resWidth);
+	BinOp opr = BinOp::NEQ64;
+	BinOpQuad * quad = new BinOpQuad(dst, opr, op1, op2);
+	proc->addQuad(quad);
+	return dst;
 }
 
 Opd * LessNode::flatten(Procedure * proc){
-	TODO(Implement me)
+	Opd * op1 = this->myExp1->flatten(proc);
+	Opd * op2 = this->myExp2->flatten(proc);
+	size_t width = proc->getProg()->opWidth(this->myExp1);
+	size_t resWidth = Opd::width(BasicType::BOOL());
+	Opd * dst = proc->makeTmp(resWidth);
+	BinOp opr = BinOp::LT64;
+	BinOpQuad * quad = new BinOpQuad(dst, opr, op1, op2);
+	proc->addQuad(quad);
+	return dst;
 }
 
 Opd * GreaterNode::flatten(Procedure * proc){
-	TODO(Implement me)
+	Opd * op1 = this->myExp1->flatten(proc);
+	Opd * op2 = this->myExp2->flatten(proc);
+	size_t width = proc->getProg()->opWidth(this->myExp1);
+	size_t resWidth = Opd::width(BasicType::BOOL());
+	Opd * dst = proc->makeTmp(resWidth);
+	BinOp opr = BinOp::GT64;
+	BinOpQuad * quad = new BinOpQuad(dst, opr, op1, op2);
+	proc->addQuad(quad);
+	return dst;
 }
 
 Opd * LessEqNode::flatten(Procedure * proc){
-	TODO(Implement me)
+	Opd * op1 = this->myExp1->flatten(proc);
+	Opd * op2 = this->myExp2->flatten(proc);
+	size_t width = proc->getProg()->opWidth(this->myExp1);
+	size_t resWidth = Opd::width(BasicType::BOOL());
+	Opd * dst = proc->makeTmp(resWidth);
+	BinOp opr = BinOp::LTE64;
+	BinOpQuad * quad = new BinOpQuad(dst, opr, op1, op2);
+	proc->addQuad(quad);
+	return dst;
 }
 
 Opd * GreaterEqNode::flatten(Procedure * proc){
-	TODO(Implement me)
+	Opd * op1 = this->myExp1->flatten(proc);
+	Opd * op2 = this->myExp2->flatten(proc);
+	size_t width = proc->getProg()->opWidth(this->myExp1);
+	size_t resWidth = Opd::width(BasicType::BOOL());
+	Opd * dst = proc->makeTmp(resWidth);
+	BinOp opr = BinOp::GTE64;
+	BinOpQuad * quad = new BinOpQuad(dst, opr, op1, op2);
+	proc->addQuad(quad);
+	return dst;
 }
 
 void AssignStmtNode::to3AC(Procedure * proc){
-	TODO(Implement me)
+	Opd * res = mySrc->flatten(proc);
 }
 
 void PostIncStmtNode::to3AC(Procedure * proc){
-	TODO(Implement me)
+	Opd * child = this->myLoc->flatten(proc);
+	size_t width = proc->getProg()->opWidth(myLoc);
+	BinOp opr = BinOp::ADD64;
+	LitOpd * litOpd = new LitOpd("1", width);
+	BinOpQuad * quad = new BinOpQuad(child, opr, child, litOpd);
+	proc->addQuad(quad);
 }
 
 void PostDecStmtNode::to3AC(Procedure * proc){
-	TODO(Implement me)
+	Opd * child = this->myLoc->flatten(proc);
+	size_t width = proc->getProg()->opWidth(myLoc);
+	BinOp opr = BinOp::SUB64;
+	LitOpd * litOpd = new LitOpd("1", width);
+	BinOpQuad * quad = new BinOpQuad(child, opr, child, litOpd);
+	proc->addQuad(quad);
 }
 
 void GiveStmtNode::to3AC(Procedure * proc){
-	TODO(Implement me)
+	Opd * child = this->mySrc->flatten(proc);
+	//proc->addQuad(new IntrinsicOutputQuad(child, proc->getProg()->nodeType(mySrc)));
 }
 
 void TakeStmtNode::to3AC(Procedure * proc){
-	TODO(Implement me)
+	Opd * child = this->myDst->flatten(proc);
+	//proc->addQuad(new IntrinsicInputQuad(child, proc->getProg()->nodeType(myDst)));
 }
 
 void IfStmtNode::to3AC(Procedure * proc){
-	TODO(Implement me)
+	Opd * cond = myCond->flatten(proc);
+	Label * afterLabel = proc->makeLabel();
+	Quad * afterNop = new NopQuad();
+	afterNop->addLabel(afterLabel);
+
+	proc->addQuad(new IfzQuad(cond, afterLabel));
+	for (auto stmt : *myBody){
+		stmt->to3AC(proc);
+	}
+	proc->addQuad(afterNop);
 }
 
 void IfElseStmtNode::to3AC(Procedure * proc){
-	TODO(Implement me)
+	Label * elseLabel = proc->makeLabel();
+	Quad * elseNop = new NopQuad();
+	elseNop->addLabel(elseLabel);
+	Label * afterLabel = proc->makeLabel();
+	Quad * afterNop = new NopQuad();
+	afterNop->addLabel(afterLabel);
+
+	Opd * cond = myCond->flatten(proc);
+
+	Quad * jmpFalse = new IfzQuad(cond, elseLabel);
+	proc->addQuad(jmpFalse);
+	for (auto stmt : *myBodyTrue){
+		stmt->to3AC(proc);
+	}
+	
+	Quad * skipFall = new GotoQuad(afterLabel);
+	proc->addQuad(skipFall);
+
+	proc->addQuad(elseNop);
+	
+	for (auto stmt : *myBodyFalse){
+		stmt->to3AC(proc);
+	}
+
+	proc->addQuad(afterNop);
 }
 
 void WhileStmtNode::to3AC(Procedure * proc){
-	TODO(Implement me)
+	Quad * headNop = new NopQuad();
+	Label * headLabel = proc->makeLabel();
+	headNop->addLabel(headLabel);
+
+	Label * afterLabel = proc->makeLabel();
+	Quad * afterQuad = new NopQuad();
+	afterQuad->addLabel(afterLabel);
+
+	proc->addQuad(headNop);
+	Opd * cond = myCond->flatten(proc);
+	Quad * jmpFalse = new IfzQuad(cond, afterLabel);
+	proc->addQuad(jmpFalse);
+
+	for (auto stmt : *myBody){
+		stmt->to3AC(proc);
+	}
+
+	Quad * loopBack = new GotoQuad(headLabel);
+	proc->addQuad(loopBack);
+	proc->addQuad(afterQuad);
 }
 
 void CallStmtNode::to3AC(Procedure * proc){
-	TODO(Implement me)
+	Opd * res = myCallExp->flatten(proc);
+	if (res != nullptr){
+		Quad * last = proc->popQuad();
+	}
 }
 
 void ReturnStmtNode::to3AC(Procedure * proc){
-	TODO(Implement me)
+	if (myExp != nullptr){
+		Opd * res = myExp->flatten(proc);
+		
+		const DataType * type = proc->getProg()->nodeType(myExp);
+		Quad * setOut = new SetRetQuad(res);
+
+		proc->addQuad(setOut);
+	}
+	
+	Label * leaveLbl = proc->getLeaveLabel();
+	Quad * jmpLeave = new GotoQuad(leaveLbl);
+	proc->addQuad(jmpLeave);
 }
 
 void ExitStmtNode::to3AC(Procedure * proc){
@@ -171,7 +357,12 @@ void VarDeclNode::to3AC(IRProgram * prog){
 //We only get to this node if we are in a stmt
 // context (DeclNodes protect descent)
 Opd * IDNode::flatten(Procedure * proc){
-	TODO(Implement me)
+	SemSymbol * sym = this->getSymbol();
+	Opd * res = proc->getSymOpd(sym);
+	if (!res){
+		throw new InternalError("null id sym");;
+	}
+	return res;
 }
 
 }
