@@ -1,0 +1,10 @@
+[BEGIN GLOBALS]
+trueOrFalse
+[END GLOBALS]
+[BEGIN trueOrFalse LOCALS]
+a (local var of 8 bytes)
+b (local var of 8 bytes)
+c (local var of 8 bytes)
+[END trueOrFalse LOCALS]
+fun_trueOrFalse: enter trueOrFalse
+lbl_0:      leave trueOrFalse
