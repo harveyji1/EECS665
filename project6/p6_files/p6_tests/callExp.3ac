@@ -1,0 +1,53 @@
+[BEGIN GLOBALS]
+callee1
+callee2
+callee3
+caller
+[END GLOBALS]
+[BEGIN callee1 LOCALS]
+b (formal arg of 8 bytes)
+[END callee1 LOCALS]
+fun_callee1: enter callee1
+            getarg 1 [b]
+            IFZ [b] GOTO lbl_1
+            setret 1
+            goto lbl_0
+            goto lbl_2
+lbl_1:      nop
+            setret 0
+            goto lbl_0
+lbl_2:      nop
+lbl_0:      leave callee1
+[BEGIN callee2 LOCALS]
+[END callee2 LOCALS]
+fun_callee2: enter callee2
+            setret 1
+            goto lbl_3
+lbl_3:      leave callee2
+[BEGIN callee3 LOCALS]
+a (formal arg of 8 bytes)
+tmp0 (tmp var of 8 bytes)
+[END callee3 LOCALS]
+fun_callee3: enter callee3
+            getarg 1 [a]
+            [tmp0] := [a] ADD64 1
+            [a] := [tmp0]
+lbl_4:      leave callee3
+[BEGIN caller LOCALS]
+myB (local var of 8 bytes)
+myA (local var of 8 bytes)
+tmp0 (tmp var of 8 bytes)
+tmp1 (tmp var of 8 bytes)
+[END caller LOCALS]
+fun_caller: enter caller
+            setarg 1 [myB]
+            call callee1
+            getret [tmp0]
+            [myA] := [tmp0]
+            call callee2
+            getret [tmp1]
+            [myB] := [tmp1]
+            setarg 1 [myA]
+            call callee3
+lbl_5:      leave caller
+
