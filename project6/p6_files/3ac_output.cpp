@@ -1,6 +1,5 @@
 #include "ast.hpp"
 
-//FnDeclNode
 //FormalDeclNode
 //CallExpNode
 //ExitStmt
@@ -17,8 +16,36 @@ IRProgram * ProgramNode::to3AC(TypeAnalysis * ta){
 	return prog;
 }
 
+static void formalsTo3AC(Procedure * proc,
+  std::list<FormalDeclNode *> * myFormals){
+	for (auto formal : *myFormals){
+		formal->to3AC(proc);
+	}
+	unsigned int argIdx = 1;
+	for (auto formal : *myFormals){
+		SemSymbol * sym = formal->ID()->getSymbol();
+		SymOpd * opd = proc->getSymOpd(sym);
+
+		Quad * inQuad = new GetArgQuad(argIdx, opd);
+		proc->addQuad(inQuad);
+		argIdx += 1;
+	}
+}
+
 void FnDeclNode::to3AC(IRProgram * prog){
-	TODO(Implement me)
+	SemSymbol * mySym = this->ID()->getSymbol();
+	Procedure * proc = prog->makeProc(mySym->getName());
+
+	//Put the function itself into global scope
+	// for function pointers
+	prog->gatherGlobal(mySym);
+
+	//Generate the getin quads
+	formalsTo3AC(proc, myFormals);
+
+	for (auto stmt : *myBody){
+		stmt->to3AC(proc);
+	}
 }
 
 void FnDeclNode::to3AC(Procedure * proc){
@@ -221,7 +248,16 @@ Opd * GreaterEqNode::flatten(Procedure * proc){
 }
 
 void AssignStmtNode::to3AC(Procedure * proc){
-	Opd * res = mySrc->flatten(proc);
+	Opd * rhs = mySrc->flatten(proc);
+	Opd * lhs = myDst->flatten(proc);
+	if (!lhs){
+		throw InternalError("null tgt");
+	}
+
+	AssignQuad * quad = new AssignQuad(lhs, rhs);
+
+	quad->setComment("Assign");
+	proc->addQuad(quad);
 }
 
 void PostIncStmtNode::to3AC(Procedure * proc){
