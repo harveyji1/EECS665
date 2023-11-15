@@ -1,0 +1,17 @@
+[BEGIN GLOBALS]
+func
+[END GLOBALS]
+[BEGIN func LOCALS]
+myB (local var of 8 bytes)
+myA (local var of 8 bytes)
+tmp0 (tmp var of 8 bytes)
+tmp1 (tmp var of 8 bytes)
+[END func LOCALS]
+fun_func:   enter func
+            [tmp0] := NOT64 [myB]
+            IFZ [tmp0] GOTO lbl_1
+            [tmp1] := NEG64 1
+            [myA] := [tmp1]
+lbl_1:      nop
+lbl_0:      leave func
+

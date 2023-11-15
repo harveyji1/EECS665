@@ -1,0 +1,24 @@
+[BEGIN GLOBALS]
+main
+[END GLOBALS]
+[BEGIN main LOCALS]
+myB (local var of 8 bytes)
+myA (local var of 8 bytes)
+myC (local var of 8 bytes)
+myD (local var of 8 bytes)
+tmp0 (tmp var of 8 bytes)
+tmp1 (tmp var of 8 bytes)
+tmp2 (tmp var of 8 bytes)
+tmp3 (tmp var of 8 bytes)
+[END main LOCALS]
+main:       enter main
+            [tmp0] := [myA] ADD64 [myB]
+            [myC] := [tmp0]
+            [tmp1] := [myC] MULT64 3
+            [myD] := [tmp1]
+            [tmp2] := [myD] DIV64 3
+            [myB] := [tmp2]
+            [tmp3] := [myB] SUB64 2
+            [myA] := [tmp3]
+lbl_0:      leave main
+
