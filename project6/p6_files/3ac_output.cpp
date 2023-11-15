@@ -117,6 +117,8 @@ Opd * CallExpNode::flatten(Procedure * proc){
 	}
 }
 
+//test all unary
+
 Opd * NegNode::flatten(Procedure * proc){
 	Opd * child = myExp->flatten(proc);
 	size_t width = proc->getProg()->opWidth(this);
@@ -136,6 +138,7 @@ Opd * NotNode::flatten(Procedure * proc){
 	return dst;
 }
 
+//test all math
 Opd * PlusNode::flatten(Procedure * proc){
 	Opd * childL = myExp1->flatten(proc);
 	Opd * childR = myExp2->flatten(proc);
@@ -180,6 +183,7 @@ Opd * DivideNode::flatten(Procedure * proc){
 	return dst;
 }
 
+//test both logic
 Opd * AndNode::flatten(Procedure * proc){
 	Opd * op1 = this->myExp1->flatten(proc);
 	Opd * op2 = this->myExp2->flatten(proc);
@@ -200,6 +204,7 @@ Opd * OrNode::flatten(Procedure * proc){
 	return opRes;
 }
 
+//test all the comparisons
 Opd * EqualsNode::flatten(Procedure * proc){
 	Opd * op1 = this->myExp1->flatten(proc);
 	Opd * op2 = this->myExp2->flatten(proc);
@@ -248,6 +253,7 @@ Opd * GreaterNode::flatten(Procedure * proc){
 	return dst;
 }
 
+
 Opd * LessEqNode::flatten(Procedure * proc){
 	Opd * op1 = this->myExp1->flatten(proc);
 	Opd * op2 = this->myExp2->flatten(proc);
@@ -260,6 +266,7 @@ Opd * LessEqNode::flatten(Procedure * proc){
 	return dst;
 }
 
+//test
 Opd * GreaterEqNode::flatten(Procedure * proc){
 	Opd * op1 = this->myExp1->flatten(proc);
 	Opd * op2 = this->myExp2->flatten(proc);
@@ -285,6 +292,7 @@ void AssignStmtNode::to3AC(Procedure * proc){
 	proc->addQuad(quad);
 }
 
+//test
 void PostIncStmtNode::to3AC(Procedure * proc){
 	Opd * child = this->myLoc->flatten(proc);
 	size_t width = proc->getProg()->opWidth(myLoc);
@@ -294,6 +302,7 @@ void PostIncStmtNode::to3AC(Procedure * proc){
 	proc->addQuad(quad);
 }
 
+//test
 void PostDecStmtNode::to3AC(Procedure * proc){
 	Opd * child = this->myLoc->flatten(proc);
 	size_t width = proc->getProg()->opWidth(myLoc);
@@ -303,16 +312,19 @@ void PostDecStmtNode::to3AC(Procedure * proc){
 	proc->addQuad(quad);
 }
 
+//test
 void GiveStmtNode::to3AC(Procedure * proc){
 	Opd * child = this->mySrc->flatten(proc);
 	proc->addQuad(new WriteQuad(child, proc->getProg()->nodeType(mySrc)));
 }
 
+//test
 void TakeStmtNode::to3AC(Procedure * proc){
 	Opd * child = this->myDst->flatten(proc);
 	proc->addQuad(new ReadQuad(child, proc->getProg()->nodeType(myDst)));
 }
 
+//test
 void IfStmtNode::to3AC(Procedure * proc){
 	Opd * cond = myCond->flatten(proc);
 	Label * afterLabel = proc->makeLabel();
@@ -326,6 +338,7 @@ void IfStmtNode::to3AC(Procedure * proc){
 	proc->addQuad(afterNop);
 }
 
+//test
 void IfElseStmtNode::to3AC(Procedure * proc){
 	Label * elseLabel = proc->makeLabel();
 	Quad * elseNop = new NopQuad();
@@ -354,6 +367,7 @@ void IfElseStmtNode::to3AC(Procedure * proc){
 	proc->addQuad(afterNop);
 }
 
+//test
 void WhileStmtNode::to3AC(Procedure * proc){
 	Quad * headNop = new NopQuad();
 	Label * headLabel = proc->makeLabel();
@@ -399,6 +413,7 @@ void ReturnStmtNode::to3AC(Procedure * proc){
 	proc->addQuad(jmpLeave);
 }
 
+//test
 void ExitStmtNode::to3AC(Procedure * proc){
 	proc->addQuad(new ExitQuad());
 }
