@@ -1,11 +1,5 @@
 #include "ast.hpp"
 
-//FormalDeclNode
-//CallExpNode
-//ExitStmt
-//GiveStmtNode
-//TakeStmtNode
-
 namespace drewno_mars{
 
 IRProgram * ProgramNode::to3AC(TypeAnalysis * ta){
@@ -65,7 +59,8 @@ void FormalDeclNode::to3AC(IRProgram * prog){
 }
 
 void FormalDeclNode::to3AC(Procedure * proc){
-	TODO(Implement me)
+	SemSymbol * sym = ID()->getSymbol();
+	proc->gatherFormal(sym);
 }
 
 Opd * IntLitNode::flatten(Procedure * proc){
@@ -88,8 +83,38 @@ Opd * FalseNode::flatten(Procedure * proc){
 	return res;
 }
 
+static void argsTo3AC(Procedure * proc, std::list<ExpNode *> * args){
+	std::list<std::pair<Opd *, const DataType *>> argOpds;
+	for (auto argNode : *args){
+		Opd * argOpd = argNode->flatten(proc);
+		const DataType * argType = proc->getProg()->nodeType(argNode);
+		argOpds.push_back(std::make_pair(argOpd, argType));
+	}
+	size_t argIdx = 1;
+	for (auto argOpd : argOpds){
+		//if this doesnt work try doing just argOpd, not argOpd.first
+		Quad * argQuad = new SetArgQuad(argIdx, argOpd.first);
+		proc->addQuad(argQuad);
+		argIdx++;
+	}
+}
+
 Opd * CallExpNode::flatten(Procedure * proc){
-	TODO(Implement me)
+	argsTo3AC(proc, myArgs);
+	Quad * callQuad = new CallQuad(myCallee->getSymbol());
+	proc->addQuad(callQuad);
+
+	SemSymbol * idSym = myCallee->getSymbol();
+	const FnType * calleeType = idSym->getDataType()->asFn();
+	const DataType * retType = calleeType->getReturnType();
+	if (retType->isVoid()){
+		return nullptr;
+	} else {
+		Opd * retVal = proc->makeTmp(Opd::width(retType));
+		Quad * getRet = new GetRetQuad(retVal);
+		proc->addQuad(getRet);
+		return retVal;
+	}
 }
 
 Opd * NegNode::flatten(Procedure * proc){
@@ -280,12 +305,12 @@ void PostDecStmtNode::to3AC(Procedure * proc){
 
 void GiveStmtNode::to3AC(Procedure * proc){
 	Opd * child = this->mySrc->flatten(proc);
-	//proc->addQuad(new IntrinsicOutputQuad(child, proc->getProg()->nodeType(mySrc)));
+	proc->addQuad(new WriteQuad(child, proc->getProg()->nodeType(mySrc)));
 }
 
 void TakeStmtNode::to3AC(Procedure * proc){
 	Opd * child = this->myDst->flatten(proc);
-	//proc->addQuad(new IntrinsicInputQuad(child, proc->getProg()->nodeType(myDst)));
+	proc->addQuad(new ReadQuad(child, proc->getProg()->nodeType(myDst)));
 }
 
 void IfStmtNode::to3AC(Procedure * proc){
@@ -375,7 +400,7 @@ void ReturnStmtNode::to3AC(Procedure * proc){
 }
 
 void ExitStmtNode::to3AC(Procedure * proc){
-	TODO(Implement me)
+	proc->addQuad(new ExitQuad());
 }
 
 void VarDeclNode::to3AC(Procedure * proc){
