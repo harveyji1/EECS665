@@ -394,13 +394,13 @@ void CallQuad::codegenX64(std::ostream& out){
 	out << "call " << sym->toString() << "\n";
 
 	// get callee's number of args
-	int numArgs = sym->getDataType()->asFn()->getFormalTypes()->size();
+	int numArgs = sym->getDataType()->asFn()->getFormalTypes()->getSize();
 
 	if (numArgs >= 7 && numArgs % 2 != 0) {
 		out << "pushq $0 \n";
 	}
 	out << "callq fun_" << sym->getName() << "\n";
-	size_t cleanup;
+	int cleanup;
 	if (numArgs >= 7) {
 		cleanup = 8*(numArgs-6);
 		if (cleanup % 16 != 0) cleanup = cleanup + 8;

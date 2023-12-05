@@ -4,8 +4,6 @@ main : () bool{
     myAnd : bool = myTrue and myFalse;
     myOr : bool = myTrue or myFalse;
     give myTrue;
-    give '/n';
+    give "\n";
     give myOr;
-    give '\n';
-    give MyAnd;
 }
