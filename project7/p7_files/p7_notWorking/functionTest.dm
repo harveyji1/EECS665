@@ -2,12 +2,12 @@ fn1 : (arg1: int) void{
     a: int;
     a = arg1;
     give a;
-    give '/n';
+    give "\n";
 }
 
 fn2: () void{
     give "test";
-    give '/n';
+    give "\n";
 }
 
 fn3: () void{
