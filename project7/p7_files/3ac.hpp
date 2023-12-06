@@ -464,6 +464,7 @@ private:
 	size_t index;
 	Opd * opd;
 	bool myIsRecord;
+	Procedure * myProc; //added this line
 };
 
 class SetRetQuad : public Quad{

@@ -40,6 +40,7 @@ void IRProgram::toX64(std::ostream& out){
 	// Iterate over each procedure and codegen it
 	out << ".globl main\n";
 	out << ".text\n";
+	//out << "jmp main\n"; //think the first thing you need to do is jump to main
 	for (auto p : *procs) {
 		p->toX64(out);
 	}
@@ -75,13 +76,13 @@ void Procedure::toX64(std::ostream& out){
 
 	enter->codegenLabels(out);
 	enter->codegenX64(out);
-	out << "#Fn body " << myName << "\n";
+	out << "# Fn body " << myName << "\n";
 	for (auto quad : *bodyQuads){
 		quad->codegenLabels(out);
-		out << "#" << quad->toString() << "\n";
+		out << " # " << quad->toString() << "\n";
 		quad->codegenX64(out);
 	}
-	out << "#Fn epilogue " << myName << "\n";
+	out << "# Fn epilogue " << myName << "\n";
 	leave->codegenLabels(out);
 	leave->codegenX64(out);
 }
@@ -360,7 +361,7 @@ void ExitQuad::codegenX64(std::ostream& out){
 }
 
 void WriteQuad::codegenX64(std::ostream& out){
-	if (mySrc->locString() != "console") {
+	if (mySrc->locString() != "console") { //this doesn't apply to our project i think
 
 		mySrc->genLoadVal(out, SI);
 	} else {
@@ -391,7 +392,7 @@ void NopQuad::codegenX64(std::ostream& out){
 }
 
 void CallQuad::codegenX64(std::ostream& out){
-	out << "call " << sym->toString() << "\n";
+	//out << "call " << sym->toString() << "\n"; //this line was causing an error. Not sure why this is printed
 
 	// get callee's number of args
 	int numArgs = sym->getDataType()->asFn()->getFormalTypes()->getSize();
@@ -445,7 +446,35 @@ void SetArgQuad::codegenX64(std::ostream& out){
 }
 
 void GetArgQuad::codegenX64(std::ostream& out){
-	//do nothing
+	std::string memLoc = opd->getMemoryLoc();
+	
+	switch (index) { 
+		case 1:
+			out << "movq " << "%rdi, " << memLoc << "\n";
+			break;
+		case 2:
+			out << "movq " << "%rsi, " << memLoc << "\n";
+			break;
+		case 3:
+			out << "movq " << "%rdx, " << memLoc << "\n";
+			break;
+		case 4:
+			out << "movq " << "%rcx, " << memLoc << "\n";
+			break;
+		case 5:
+			out << "movq " << "%r8, " << memLoc << "\n";
+			break;
+		case 6:
+			out << "movq " << "%r9, " << memLoc << "\n";
+			break;
+		default:
+			size_t numArgs = myProc->getFormals().size();
+			if (numArgs % 2 != 0) numArgs = numArgs + 1;
+			size_t stackIndex = 8 * (numArgs - index);
+			out << "movq " << stackIndex << "(%rbp), %rbx\n";
+			out << "movq %rbx, " << memLoc << "\n";
+			break;
+	}
 }
 
 void SetRetQuad::codegenX64(std::ostream& out){
