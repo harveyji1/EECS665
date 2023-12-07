@@ -120,16 +120,15 @@ void BinOpQuad::codegenX64(std::ostream& out){
 	}
 	else if(op == DIV64)
 	{
-		src1->genLoadVal(out, D);
-		src2->genLoadVal(out, A);
-		out << "movq $0, %rdx\nidivq %rbx\nmovq %rax, %rbx\n";
-		dst->genStoreVal(out, B);
+		out << "cqto\n";
+		out << "idivq " << RegUtils::reg64(B) << "\n";
+		dst->genStoreVal(out, A);
 	}
 	else if(op == MULT64)
 	{
 		src1->genLoadVal(out, A);
 		src2->genLoadVal(out, B);
-		out << "imulq %rbx, %rax\n";
+		out << "imulq " << RegUtils::reg64(B) << "\n";
 		dst->genStoreVal(out, A);
 
 	} 
