@@ -401,12 +401,6 @@ void CallQuad::codegenX64(std::ostream& out){
 		out << "pushq $0 \n";
 	}
 	out << "callq fun_" << sym->getName() << "\n";
-	int cleanup;
-	if (numArgs >= 7) {
-		cleanup = 8*(numArgs-6);
-		if (cleanup % 16 != 0) cleanup = cleanup + 8;
-		out << "addq $" << cleanup << ", %rsp\n";
-	}
 }
 
 void EnterQuad::codegenX64(std::ostream& out){
