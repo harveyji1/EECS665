@@ -361,12 +361,12 @@ void ExitQuad::codegenX64(std::ostream& out){
 }
 
 void WriteQuad::codegenX64(std::ostream& out){
-	if (mySrc->locString() != "console") { //this doesn't apply to our project i think
-
-		mySrc->genLoadVal(out, SI);
-	} else {
-		out << "movq $0, %rsi\n";
-	}
+	//if (mySrc->locString() != "console") { //this doesn't apply to our project i think
+//
+	//	mySrc->genLoadVal(out, SI);
+	//} else {
+	//	out << "movq $0, %rsi\n";
+	//}
 	mySrc->genLoadVal(out, DI);
 	if (mySrcType->isInt()) {
 		out << "callq printInt\n";

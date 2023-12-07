@@ -12,9 +12,13 @@ callee2 : () bool {
     return true;
 }
 
-callee3 : (a: int) void{
+callee3 : (a: int, b: bool) void{
     a = a+1;
     give a;
+}
+
+callee4 : () void {
+    give 1;
 }
 
 main : () void{
@@ -22,5 +26,6 @@ main : () void{
     myA : int;
     myA = callee1(myB);
     myB = callee2();
-    callee3(myA);
+    callee3(myA, true);
+    callee4();
 }
